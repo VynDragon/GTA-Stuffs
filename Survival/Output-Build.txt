@@ -1,0 +1,8 @@
+﻿1>------ Build started: Project: Survival, Configuration: Release x64 ------
+1>  main.cpp
+1>  script.cpp
+1>  Generating code
+1>  All 297 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+1>  Finished generating code
+1>  Survival.vcxproj -> D:\GTA\Survival\bin\Release\Survival.asi
+========== Build: 1 succeeded, 0 failed, 0 up-to-date, 0 skipped ==========

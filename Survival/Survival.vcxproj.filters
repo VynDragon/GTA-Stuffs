@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="script.cpp" />
+    <ClCompile Include="hud.cpp" />
+    <ClCompile Include="OptionManager.cpp" />
+    <ClCompile Include="PedStatus.cpp" />
+    <ClCompile Include="PlayerStatus.cpp" />
+    <ClCompile Include="InventoryObject.cpp" />
+    <ClCompile Include="Inventory.cpp" />
+    <ClCompile Include="InventoryMenu.cpp" />
+    <ClCompile Include="PlayerKeys.cpp" />
+    <ClCompile Include="ContainerManager.cpp" />
+    <ClCompile Include="..\Common\Kamikaze_Menu.cpp" />
+    <ClCompile Include="..\Common\keyboard.cpp" />
+    <ClCompile Include="..\Common\Menu.cpp" />
+    <ClCompile Include="..\Common\Utilities.cpp" />
+    <ClCompile Include="..\Common\KeyManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="hud.h" />
+    <ClInclude Include="OptionManager.h" />
+    <ClInclude Include="PedStatus.h" />
+    <ClInclude Include="PlayerStatus.h" />
+    <ClInclude Include="Defines.h" />
+    <ClInclude Include="InventoryObject.h" />
+    <ClInclude Include="Inventory.h" />
+    <ClInclude Include="InventoryMenu.h" />
+    <ClInclude Include="PlayerKeys.h" />
+    <ClInclude Include="Container.h" />
+    <ClInclude Include="ContainerManager.h" />
+    <ClInclude Include="..\inc\main.h" />
+    <ClInclude Include="..\inc\enums.h" />
+    <ClInclude Include="..\inc\natives.h" />
+    <ClInclude Include="..\inc\types.h" />
+    <ClInclude Include="..\Common\Ammos.h" />
+    <ClInclude Include="..\Common\Food.h" />
+    <ClInclude Include="..\Common\Kamikaze_Menu.h" />
+    <ClInclude Include="..\Common\keyboard.h" />
+    <ClInclude Include="..\Common\Keys.h" />
+    <ClInclude Include="..\Common\Menu.h" />
+    <ClInclude Include="..\Common\script.h" />
+    <ClInclude Include="..\Common\Weapons.h" />
+    <ClInclude Include="..\Common\KeyManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{fe82bd4a-2d14-486a-8be5-8bf6b50a2414}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+</Project>
