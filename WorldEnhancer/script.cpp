@@ -49,9 +49,9 @@ void main(bool devMode, float enhancerRenderDistance, float distanceBetweenWreck
 		{
 			Vector3	out, outb;
 			float	outh;
-			if (PATHFIND::GET_RANDOM_VEHICLE_NODE(plcoords.x, plcoords.y, plcoords.z, 100.0f, true, true, true, &out, &outh))
-			{
-				if (PATHFIND::GET_SAFE_COORD_FOR_PED(out.x + rand() % 80 - 40, out.y + rand() % 80 - 40, out.z, false, &outb, 0))
+			/*if (PATHFIND::GET_RANDOM_VEHICLE_NODE(plcoords.x, plcoords.y, plcoords.z, 100.0f, true, true, true, &out, &outh))
+			{*/
+				if (PATHFIND::GET_SAFE_COORD_FOR_PED(plcoords.x + rand() % 120 - 60, plcoords.y + rand() % 120 - 60, plcoords.z, false, &outb, 0))
 				{
 					if (PATHFIND::IS_POINT_ON_ROAD(outb.x, outb.y, outb.z, 0))
 					{
@@ -62,7 +62,7 @@ void main(bool devMode, float enhancerRenderDistance, float distanceBetweenWreck
 							carManager.add(new Decoration(carWrecks[rand() % carWrecks.size()], outb.x, outb.y, outb.z, (float)(rand() % 360)), true);
 					}
 				}
-			}
+			//}
 			carManager.tick(plcoords, enhancerRenderDistance);
 			longTick = GetTickCount() + 10;
 		}
@@ -70,7 +70,7 @@ void main(bool devMode, float enhancerRenderDistance, float distanceBetweenWreck
 		if (GetTickCount() > longTickb)
 		{
 			baseManager.tick(plcoords, enhancerRenderDistance);
-			longTick = GetTickCount() + 100;
+			longTickb = GetTickCount() + 100;
 		}
 		lightManager.tick(plcoords, enhancerRenderDistance);
 		//devmode

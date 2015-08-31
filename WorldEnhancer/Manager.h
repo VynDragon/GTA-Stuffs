@@ -74,6 +74,8 @@ public:
 			}
 			it++;
 		}
+		managed mp = { NULL, 0, 0 };
+		return (mp);
 	}
 	void							add(T *that, bool writeTofile) 
 	{ 
