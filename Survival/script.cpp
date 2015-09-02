@@ -79,8 +79,6 @@ void main()
 		player->tick();
 		if (GetTickCount() > longTick)
 		{
-			UI::DISPLAY_HUD(false);
-			UI::DISPLAY_RADAR(false);
 			containerManager.tick(player->getPos());
 			longTick = GetTickCount() + 600;
 		}

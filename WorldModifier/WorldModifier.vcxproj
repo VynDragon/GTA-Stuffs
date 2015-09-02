@@ -8,6 +8,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\keyboard.cpp" />
+    <ClCompile Include="..\Common\Utilities.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="script.cpp" />
   </ItemGroup>

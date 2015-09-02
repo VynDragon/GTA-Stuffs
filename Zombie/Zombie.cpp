@@ -8,6 +8,25 @@
 
 namespace Zombie
 {
+	Ped		is_headtracking_which_player_ped(Ped ped) // return the player targeted, we only care about many ped attacking another ped if that ped is player, normal ped can just get their 1 or 2 zombies
+	{
+		if (PLAYER::IS_PLAYER_ONLINE())
+		{
+			for (Player i = 0; i < NETWORK::NETWORK_GET_NUM_CONNECTED_PLAYERS(); i++)
+			{
+				if (PED::IS_PED_HEADTRACKING_PED(ped, PLAYER::GET_PLAYER_PED(i)))
+					return (PLAYER::GET_PLAYER_PED(i));
+			}
+			return (-1);
+		}
+		else
+		{
+			if (PED::IS_PED_HEADTRACKING_PED(ped, PLAYER::PLAYER_PED_ID()))
+				return (PLAYER::PLAYER_PED_ID());
+			else
+				return (-1);
+		}
+	}
 	static std::vector<Ped>	zombies;
 	void		zombify_nearby_ped(Ped id) // shitfunction
 	{
@@ -72,25 +91,6 @@ namespace Zombie
 		}
 	}
 
-	Ped		is_headtracking_which_player_ped(Ped ped) // return the player targeted, we only care about many ped attacking another ped if that ped is player, normal ped can just get their 1 or 2 zombies
-	{
-		if (PLAYER::IS_PLAYER_ONLINE())
-		{
-			for (Player i = 0; i < NETWORK::NETWORK_GET_NUM_CONNECTED_PLAYERS(); i++)
-			{
-				if (PED::IS_PED_HEADTRACKING_PED(ped, PLAYER::GET_PLAYER_PED(i)))
-					return (PLAYER::GET_PLAYER_PED(i));
-			}
-			return (-1);
-		}
-		else
-			{
-				if (PED::IS_PED_HEADTRACKING_PED(ped, PLAYER::PLAYER_PED_ID()))
-					return (PLAYER::PLAYER_PED_ID());
-				else
-					return (-1);
-			}
-	}
 
 	void		actualize_attacks(void)
 	{
@@ -101,6 +101,21 @@ namespace Zombie
 			if (ENTITY::IS_AN_ENTITY(*it))
 				if (!PED::_IS_PED_DEAD(*it, true))
 				{
+					Any	bone;
+					//if (target != -1)
+					/*Ped target = PLAYER::PLAYER_PED_ID();
+					Vector3	tCoords = ENTITY::GET_ENTITY_COORDS(target, true);
+					Vector3	pCoords = ENTITY::GET_ENTITY_COORDS(*it, true);
+					if (PED::IS_PED_IN_ANY_VEHICLE(*it, true))
+						AI::TASK_LEAVE_ANY_VEHICLE(*it, true, true);
+					if (PED::IS_PED_IN_ANY_VEHICLE(target, false) && GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(tCoords.x, tCoords.y, tCoords.z, pCoords.x, pCoords.y, pCoords.z, true) < 10.0f)
+					{
+						AI::CLEAR_PED_TASKS(*it);
+						AI::CLEAR_PED_SECONDARY_TASK(*it);
+						PED::SET_PED_KEEP_TASK(*it, false);
+						AI::TASK_ENTER_VEHICLE(*it, PED::GET_VEHICLE_PED_IS_IN(target, false), -1, -1, 2.0f, 1, 0);
+						PED::SET_PED_KEEP_TASK(*it, true);
+					}*/
 					if (PED::IS_PED_STOPPED(*it))
 					{
 						AI::CLEAR_PED_TASKS(*it);
@@ -111,18 +126,11 @@ namespace Zombie
 							AI::TASK_WANDER_STANDARD(*it, 0x471c4000, 0);
 						PED::SET_PED_KEEP_TASK(*it, true);
 					}
-					Any	bone;
 					if (PED::GET_PED_LAST_DAMAGE_BONE(*it, &bone))
 					{
 						if (!(bone == IK_Head || bone == SKEL_Head))
 							ENTITY::SET_ENTITY_HEALTH(*it, ENTITY::GET_ENTITY_MAX_HEALTH(*it));
 					}
-					/*Ped target = is_headtracking_which_player_ped(*it);
-					if (target != -1)
-						if (PED::IS_PED_IN_COMBAT(*it, true) ? !(PED::IS_PED_IN_COMBAT(*it, target) && PED::IS_PED_IN_COMBAT(target, *it)) : false)
-						{
-							AI::TASK_PUT_PED_DIRECTLY_INTO_MELEE(*it, target, 0, 0, 0, 0);
-						}*/
 				}
 			it++;
 		}
@@ -177,6 +185,7 @@ namespace Zombie
 					zombies.push_back(i);
 					PED::SET_PED_MOVEMENT_CLIPSET(i, animation, 0x3e800000);
 					PED::SET_PED_DIES_WHEN_INJURED(i, false);
+					//PED::SET_PED_RELATIONSHIP_GROUP_HASH(i, Utilities::get_hash("COUGAR"));
 					PED::SET_PED_RELATIONSHIP_GROUP_HASH(i, Utilities::get_hash("COUGAR"));
 					PED::SET_PED_COMBAT_ABILITY(i, 2);
 					PED::SET_PED_COMBAT_MOVEMENT(i, 3);
@@ -212,7 +221,7 @@ namespace Zombie
 	
 	void	ZombieMain(void)
 	{
-		DWORD			time = GetTickCount() + 200;
+		DWORD			longTick = GetTickCount(), longTickb = GetTickCount();
 		DWORD			waitforready = GetTickCount() + 2000;
 		bool			devMode;
 		float			mulZombie;
@@ -235,11 +244,15 @@ namespace Zombie
 		{
 			PLAYER::SET_PLAYER_NOISE_MULTIPLIER(PLAYER::PLAYER_ID(), 2.0f);
 			auto plcoords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED(PLAYER::PLAYER_ID()), true);
-			if (GetTickCount() > time)
+			if (GetTickCount() > longTick)
 			{
 				Zombie::place_random_zombie_near(plcoords, mulZombie);
+				longTick = GetTickCount() + 600;
+			}
+			if (GetTickCount() > longTickb)
+			{
 				Zombie::actualize_attacks();
-				time = GetTickCount() + 600;
+				longTickb = GetTickCount() + 1500;
 			}
 			if (devMode)
 			{

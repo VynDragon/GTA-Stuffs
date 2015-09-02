@@ -105,8 +105,27 @@ void main(bool snow)
 	DWORD		actualizeWeatherTime = GetTickCount();
 	DWORD		actualizeVehicules = GetTickCount();
 	GAMEPLAY::CLEAR_OVERRIDE_WEATHER();
+	/*uintptr_t	ptr = (uintptr_t)GetModuleHandle(nullptr) + (unsigned int)0x01E60020;
+	uintptr_t	tmp = 0;
+	/*std::string	txt = "ptr is:" + Utilities::xToString<unsigned long long>(ptr) + "\n Ptr at ptr is :" + Utilities::xToString<unsigned long long>(*(uintptr_t*)ptr) + "\n";
+	log_text(txt);
+	ReadProcessMemory(GetCurrentProcess(), (void*)(*(uintptr_t*)ptr + 0x90), &l, sizeof(float), NULL);
+	txt = "value is:";
+	txt += Utilities::xToString<float>(l);
+	txt += "\n";
+	log_text(txt);*/
+	//tmp = *((uintptr_t*)ptr + 0x2C8);
+	//ptr = *((uintptr_t*)tmp + 0x90);
+	/*float	fov;
+	ReadProcessMemory(GetCurrentProcess(), (void*)(tmp + 0x90), &fov, sizeof(float), NULL);
+	std::string	txt = Utilities::xToString<unsigned long long>(ptr) + "\n";
+	log_text(txt);
+	txt = Utilities::xToString<float>(fov) + "\n";
+	log_text(txt);*/
+	//VirtualProtect(fov, sizeof(float), PAGE_EXECUTE_READWRITE, nullptr);
 	while (true)
 	{
+		//*fov = 70.0f;
 		/*STREAMING::REQUEST_NAMED_PTFX_ASSET("core_snow");
 		GRAPHICS::_SET_PTFX_ASSET_NEXT_CALL("core_snow");
 		GRAPHICS::START_PARTICLE_FX_NON_LOOPED_ON_ENTITY("core_snow", PLAYER::PLAYER_PED_ID(), 0.0, 0.0, -0.5, 0.0, 0.0, 0.0, 1.0, false, false, false);*/
@@ -143,6 +162,7 @@ void main(bool snow)
 			GAMEPLAY::SET_WIND_DIRECTION((float)(rand() % 360));
 			actualizeWeatherTime = GetTickCount() + 30000;
 		}
+		//Utilities::putText(Utilities::xToString<float>(CAM::GET_GAMEPLAY_CAM_FOV()), 0.5f, 0.5f);
 		/*if (actualizeVehicules < GetTickCount())
 		{
 			Vehicle vehicles[1024];
