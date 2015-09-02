@@ -94,17 +94,36 @@ void		drop_weapon(void *data, const void *cdata)
 	PedStatus			*player = static_cast<PedStatus*>(data);
 	const std::string	*str = static_cast<const std::string*>(cdata);
 	Inventory			inv;
+
 	WEAPON::REMOVE_WEAPON_FROM_PED(player->getId(), Utilities::get_hash(*str));
 	inv.addObject(new InventoryObject_Weapon(*str));
 	ContainerManager::getCurrent()->addCrate(true, inv, player->getPos());
 	Menu::hide(Menu::currentMenu);
 }
 
-void		Hud::weapon_submenu(void *data, const void *cdata)
+void		ammo_weapon(void *data, const void *cdata)
 {
-	Menu	*submenu = new Kamikaze_Menu();
+	PedStatus			*player = static_cast<PedStatus*>(data);
+	const std::string	*str = static_cast<const std::string*>(cdata);
+	Inventory			inv;
+	Any					type = WEAPON::_GET_PED_AMMO_TYPE(player->getId(), Utilities::get_hash(*str));
+
+	inv.addObject(new InventoryObject_Ammo(get_ammo_by_weapon(*str).name, *str, WEAPON::GET_PED_AMMO_BY_TYPE(player->getId(), WEAPON::_GET_PED_AMMO_TYPE(player->getId(), Utilities::get_hash(*str)))));
+	WEAPON::SET_PED_AMMO(player->getId(), Utilities::get_hash(*str), 0);
+	ContainerManager::getCurrent()->addCrate(true, inv, player->getPos());
+	Menu::hide(Menu::currentMenu);
+}
+
+void					Hud::weapon_submenu(void *data, const void *cdata)
+{
+	Menu				*submenu = new Kamikaze_Menu();
+	PedStatus			*player = static_cast<PedStatus*>(data);
+	const std::string	*str = static_cast<const std::string*>(cdata);
 
 	submenu->add_entry(DROP_STRING, &drop_weapon, data, cdata);
+	submenu->add_entry(get_ammo_by_weapon(*str).name 
+			+ "x" + Utilities::xToString<int>(WEAPON::GET_PED_AMMO_BY_TYPE(player->getId(), WEAPON::_GET_PED_AMMO_TYPE(player->getId(), Utilities::get_hash(*str)))),
+			&ammo_weapon, data, cdata);
 	submenu->add_entry(EQUIP_STRING, &equip_weapon, data, cdata);
 	Menu::show(submenu);
 }
