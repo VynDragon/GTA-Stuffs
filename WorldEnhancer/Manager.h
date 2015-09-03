@@ -47,7 +47,10 @@ public:
 		{
 			T*	that = new T(Utilities::xToString<unsigned int>(total), file);
 			if (that->getModelName() == "")
+			{
+				delete that;
 				break;
+			}
 			this->add(that, false);
 			total++;
 		}
