@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "script.h"
+#include "Utilities.h"
 
 typedef struct {
 	std::string		name;
@@ -82,7 +83,11 @@ static const std::vector<zone> zones = { { "", 0.20f },
 { "SKID", 3 },
 { "WVINE", 3 },
 { "CALAFB", 0.35f},
-{ "SLAB", 0.35f}
+{ "SLAB", 0.35f },
+{ "MORN", 0.35f },
+{ "VESP", 0.35f },
+{ "RGLEN", 0.35f },
+{ "TONGVAV", 0.35f }
 };
 
 zone		get_zone_by_name(const std::string &name)

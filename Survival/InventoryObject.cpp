@@ -1,5 +1,6 @@
 #include "InventoryObject.h"
 #include "PedStatus.h"
+#include "..\Common\Utilities.h"
 
 
 

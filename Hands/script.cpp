@@ -2,6 +2,7 @@
 #include "..\Common\script.h"
 #include "..\Common\keyboard.h"
 #include "..\Common\Keys.h"
+#include "..\Common\Utilities.h"
 #include <sstream>
 
 

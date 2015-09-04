@@ -12,7 +12,6 @@ static const std::vector<ammoType> ammoTypes = {
 { "WEAPON_MG","Machinegun Ammo" },
 { "WEAPON_PISTOL","Pistol Ammo" },
 { "WEAPON_SMG","Submachine Gun Ammo" },
-{ "WEAPON_ASSAULTRIFLE","Rifle Ammo" },
 { "WEAPON_STUNGUN","Stungun Ammo" },
 { "WEAPON_SNIPERRIFLE","Sniper Rifle Ammo" },
 { "WEAPON_GRENADELAUNCHER","Grenade Launcher Ammo" },

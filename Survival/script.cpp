@@ -10,6 +10,7 @@
 #include <string>
 #include <ctime>
 #include <fstream>
+#include "..\Common\Utilities.h"
 
 #pragma warning(disable : 4244 4305) // double <-> float conversions
 

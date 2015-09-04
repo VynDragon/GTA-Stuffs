@@ -95,7 +95,6 @@ namespace Zombie
 	void		actualize_attacks(void)
 	{
 		auto	it = zombies.begin();
-
 		while (it != zombies.end())
 		{
 			if (ENTITY::IS_AN_ENTITY(*it))
@@ -160,7 +159,7 @@ namespace Zombie
 					GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(x, y, point.z + 500.0f, &z);
 				if (z <= 0)
 					return;
-				if (!CAM::IS_SPHERE_VISIBLE(x, y, z, 1.0))
+				if (!CAM::IS_SPHERE_VISIBLE(x, y, z, 1.0) && !INTERIOR::GET_INTERIOR_FROM_COLLISION(x, y, z))
 				{
 					char* animation = animations[rand() % animations.size()];
 					/*int		skin_hash = Utilities::get_hash(model);
@@ -180,7 +179,7 @@ namespace Zombie
 					}
 					if (timeout >= 100)
 						return;*/
-					//Ped i = PED::CREATE_PED(26, skin_hash, x, y, z, (float)(rand() % 360), true, true);
+						//Ped i = PED::CREATE_PED(26, skin_hash, x, y, z, (float)(rand() % 360), true, true);
 					Ped i = PED::CREATE_RANDOM_PED(x, y, z);
 					zombies.push_back(i);
 					PED::SET_PED_MOVEMENT_CLIPSET(i, animation, 0x3e800000);

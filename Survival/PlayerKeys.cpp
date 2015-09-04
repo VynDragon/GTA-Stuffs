@@ -3,6 +3,7 @@
 #include "Defines.h"
 #include "..\Common\Keys.h"
 #include "OptionManager.h"
+#include "..\Common\Utilities.h"
 
 
 

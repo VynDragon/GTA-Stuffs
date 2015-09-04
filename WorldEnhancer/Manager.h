@@ -10,13 +10,16 @@ class Decoration
 {
 public:
 	Decoration(const std::string &appName, const std::string &fileName);
-	Decoration(const std::string &modelName, float x, float y, float z, float heading, const std::string &prettyName = "");
+	Decoration(const std::string &modelName, float x, float y, float z, float heading, const std::string &prettyName = "", bool forceFreeze = false);
+	Decoration(Hash hash, float x, float y, float z, float heading, const std::string &prettyName = "", bool forceFreeze = false);
 	~Decoration();
 	Decoration					&operator=(const Decoration &other);
 	std::string					getModelName() const { return(modelName); }
 	std::string					getName() const { return(prettyName); }
 	Vector3						getCoords() const { return(coords); }
 	float						getHeading(void) const { return (heading); }
+	Hash						getHash(void) const { return (hash); }
+	bool						getFreeze(void) const { return (forceFreeze); }
 	void						setCoords(Vector3 c) { coords = c; }
 	void						setHeading(float h) { heading = h; }
 	virtual	void				action(void);
@@ -26,8 +29,10 @@ public:
 protected:
 	std::string	modelName;
 	std::string	prettyName;
+	Hash		hash;
 	Vector3		coords;
 	float		heading;
+	bool		forceFreeze;
 };
 
 template<typename T>
@@ -38,11 +43,13 @@ public:
 		T				*that;
 		Entity			object;
 		unsigned int	fileId;
+		Blip			blip;
 	};
-	Manager(const std::string &file) 
+	Manager(const std::string &file, bool exact = true) 
 	{
 		this->file = file;
 		total = 0;
+		this->exact = exact;
 		while (true)
 		{
 			T*	that = new T(Utilities::xToString<unsigned int>(total), file);
@@ -108,7 +115,7 @@ public:
 			it++;
 		}
 	}
-	void		tick(Vector3 position, float range)
+	void		tick(Vector3 position, float range, bool devMode = false)
 	{
 		auto	it = unloaded.begin();
 
@@ -116,16 +123,40 @@ public:
 		{
 			if (GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(position.x, position.y, position.z, (*it).that->getCoords().x, (*it).that->getCoords().y, (*it).that->getCoords().z, true) < range)
 			{
-				DWORD attachhash = Utilities::get_hash((*it).that->getModelName());
-				if (STREAMING::IS_MODEL_VALID(attachhash)) {
-					STREAMING::REQUEST_MODEL(attachhash);
-					while (!STREAMING::HAS_MODEL_LOADED(attachhash))
-						WAIT(0);
-					(*it).object = OBJECT::CREATE_OBJECT(attachhash, (*it).that->getCoords().x, (*it).that->getCoords().y, (*it).that->getCoords().z + 0.1f, 1, 1, false);
-					ENTITY::SET_ENTITY_HEADING((*it).object, (*it).that->getHeading());
-					OBJECT::PLACE_OBJECT_ON_GROUND_PROPERLY((*it).object);
-					ROPE::ACTIVATE_PHYSICS((*it).object);
+				(*it).object = 0;
+				if ((*it).that->getHash() == 0)
+				{
+					DWORD attachhash = Utilities::get_hash((*it).that->getModelName());
+					if (STREAMING::IS_MODEL_VALID(attachhash)) {
+						STREAMING::REQUEST_MODEL(attachhash);
+						/*while (!STREAMING::HAS_MODEL_LOADED(attachhash))
+							WAIT(0);*/
+						(*it).object = OBJECT::CREATE_OBJECT(attachhash, (*it).that->getCoords().x, (*it).that->getCoords().y, (*it).that->getCoords().z, 1, false, false);
+					}
 				}
+				else
+				{
+					if (STREAMING::IS_MODEL_VALID((*it).that->getHash())) {
+						STREAMING::REQUEST_MODEL((*it).that->getHash());
+						/*while (!STREAMING::HAS_MODEL_LOADED((*it).that->getHash()))
+							WAIT(0);*/
+						(*it).object = OBJECT::CREATE_OBJECT((*it).that->getHash(), (*it).that->getCoords().x, (*it).that->getCoords().y, (*it).that->getCoords().z, 1, false, false);
+					}
+				}
+				if ((*it).object != 0)
+				{
+					ENTITY::SET_ENTITY_HEADING((*it).object, (*it).that->getHeading());
+					if (!exact)
+						OBJECT::PLACE_OBJECT_ON_GROUND_PROPERLY((*it).object);
+					if ((*it).that->getFreeze())
+						ENTITY::FREEZE_ENTITY_POSITION((*it).object, true);
+					else
+						ROPE::ACTIVATE_PHYSICS((*it).object);
+					if (devMode)
+						(*it).blip = UI::ADD_BLIP_FOR_ENTITY((*it).object);
+				}
+				else
+					Utilities::notify("invalid model");
 				loaded.push_back(*it);
 				unloaded.erase(it);
 				break;
@@ -139,6 +170,8 @@ public:
 				|| !ENTITY::DOES_ENTITY_EXIST((*it).object))
 				&& !CAM::IS_SPHERE_VISIBLE((*it).that->getCoords().x, (*it).that->getCoords().y, (*it).that->getCoords().z, 1.0))
 			{
+				if (devMode)
+					UI::REMOVE_BLIP(&(*it).blip);
 				OBJECT::DELETE_OBJECT(&(*it).object);
 				unloaded.push_back(*it);
 				loaded.erase(it);
@@ -182,5 +215,6 @@ private:
 	unsigned int			total;
 	std::string				file;
 	std::vector<managed>	loaded, unloaded;
+	bool					exact;
 };
 

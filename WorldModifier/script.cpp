@@ -1,14 +1,42 @@
 
 #include "..\Common\script.h"
 #include "..\Common\keyboard.h"
+#include "..\Common\Utilities.h"
 #include <sstream>
 #include <fstream>
 #include <vector>
 #include <Psapi.h>
+#define PI 3.14f
 
 
-/* heavily 'inspired' from here: https://development.crix-dev.com/gtamp-mods/sp-snow-mod/blob/master/src/Main.cpp
-*	Thanks to whoever wrote that.
+/* COPYRIGHT FOR THE SNOW SIGNATURES:
+	* Copyright (C) GTA:Multiplayer Team (https://wiki.gta-mp.net/index.php/Team)
+	*
+	* Redistribution and use in source and binary forms, with or without
+	* modification, are permitted provided that the following conditions are
+	* met:
+	*
+	*     * Redistributions of source code must retain the above copyright
+	*		notice, this list of conditions and the following disclaimer.
+	*     * Redistributions in binary form must reproduce the above
+	*		copyright notice, this list of conditions and the following disclaimer
+	*		in the documentation and/or other materials provided with the
+	*		distribution.
+	*     * Neither the name of GTA-Network nor the names of its
+	*		contributors may be used to endorse or promote products derived from
+	*		this software without specific prior written permission.
+	*
+	* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+	* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+	* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+	* A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+	* OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+	* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT
+	* LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+	* DATA, OR PROFITS; OR BUSINESS INTERRUPTION HOWEVER CAUSED AND ON ANY
+	* THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+	* INCLUDING NEGLIGENCE OR OTHERWISE ARISING IN ANY WAY OUT OF THE USE
+	* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 void		log_text(const std::string &str)
@@ -123,6 +151,8 @@ void main(bool snow)
 	txt = Utilities::xToString<float>(fov) + "\n";
 	log_text(txt);*/
 	//VirtualProtect(fov, sizeof(float), PAGE_EXECUTE_READWRITE, nullptr);
+	UI::DISPLAY_RADAR(true);
+	UI::DISPLAY_HUD(true);
 	while (true)
 	{
 		//*fov = 70.0f;
@@ -163,19 +193,31 @@ void main(bool snow)
 			actualizeWeatherTime = GetTickCount() + 30000;
 		}
 		//Utilities::putText(Utilities::xToString<float>(CAM::GET_GAMEPLAY_CAM_FOV()), 0.5f, 0.5f);
-		/*if (actualizeVehicules < GetTickCount())
+		Vehicle vehicles[1024];
+		int count = worldGetAllVehicles(vehicles, 1024);
+		for (int i = 0; i < count; i++)
 		{
-			Vehicle vehicles[1024];
-			int count = worldGetAllVehicles(vehicles, 1024);
-			for (int i = 0; i < count; i++)
-			{
-				Vector3	pos = ENTITY::GET_ENTITY_COORDS(vehicles[i], true);
-				Vector3 forward = ENTITY::GET_ENTITY_FORWARD_VECTOR(vehicles[i]);
-				//GRAPHICS::DRAW_SPOT_LIGHT(pos.x, pos.y, pos.z + 1.0f, forward.x, forward.y, forward.z, 255, 255, 255, 100.0f, 1.0f, 1.0f, 13.0f, 1.0f);
-				VEHICLE::SET_VEHICLE_LIGHT_MULTIPLIER(vehicles[i], 1.0f);
-				VEHICLE::SET_VEHICLE_LIGHTS(vehicles[i], 2);
-			}
-			actualizeVehicules = GetTickCount() + 500;
+			Vector3	pos = ENTITY::GET_ENTITY_COORDS(vehicles[i], true);
+			Vector3 forward = ENTITY::GET_ENTITY_FORWARD_VECTOR(vehicles[i]);
+			Any		on, rail;
+			Vector3	left;
+			left.x = forward.y * 0.8f;
+			left.y = -forward.x * 0.8f;
+			left.z = forward.z * 0.8f;
+			Vector3	newforward = forward;
+			newforward.z = newforward.z - 0.1f;
+			VEHICLE::GET_VEHICLE_LIGHTS_STATE(vehicles[i], &on, &rail);
+			if (!VEHICLE::_IS_HEADLIGHT_L_BROKEN(vehicles[i]) && on)
+				GRAPHICS::DRAW_SPOT_LIGHT(pos.x - left.x + forward.x, pos.y - left.y + forward.y, pos.z - left.z + forward.z, newforward.x, newforward.y, newforward.z, 255, 255, 255, 25.0f, 5.0f, 5.0f, 15.0f, 1.0f);
+			if (!VEHICLE::_IS_HEADLIGHT_R_BROKEN(vehicles[i]) && on)
+				GRAPHICS::DRAW_SPOT_LIGHT(pos.x + left.x + forward.x, pos.y + left.y + forward.y, pos.z + left.z + forward.z, newforward.x, newforward.y, newforward.z, 255, 255, 255, 25.0f, 5.0f, 5.0f, 15.0f, 8.0f);
+			/*VEHICLE::SET_VEHICLE_LIGHT_MULTIPLIER(vehicles[i], 1.0f);
+			VEHICLE::SET_VEHICLE_LIGHTS(vehicles[i], 2);*/
+		}
+		/*Entity	entity;
+		if (PLAYER::_GET_AIMED_ENTITY(PLAYER::PLAYER_ID(), &entity))
+		{
+			Utilities::putText(Utilities::xToString<Hash>(ENTITY::GET_ENTITY_MODEL(entity)), 0.5f, 0.5f);
 		}*/
 		WAIT(0);
 	}

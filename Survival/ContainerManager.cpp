@@ -5,6 +5,7 @@
 #include "..\Common\Weapons.h"
 #include "..\Common\Ammos.h"
 #include "OptionManager.h"
+#include "..\Common\Utilities.h"
 
 ContainerManager		*ContainerManager::current;
 

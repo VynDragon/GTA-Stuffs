@@ -1,4 +1,5 @@
 #include "Menu.h"
+#include "Utilities.h"
 
 Menu	*Menu::currentMenu;
 

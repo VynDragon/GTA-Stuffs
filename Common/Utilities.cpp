@@ -1,4 +1,6 @@
-#include "script.h"
+#include <fstream>
+#include "Utilities.h"
+#include "..\inc\natives.h"
 
 namespace Utilities
 {
@@ -69,5 +71,13 @@ namespace Utilities
 			return (o);
 		}
 		return (false);
+	}
+
+	void		log_text(const std::string &str)
+	{
+		std::fstream file("log.txt", std::ios_base::out | std::ios_base::in | std::ios_base::app);
+
+		file << str;
+		file.close();
 	}
 }

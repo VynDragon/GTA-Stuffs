@@ -1,4 +1,5 @@
 #include "LightManager.h"
+#include "..\Common\Utilities.h"
 
 LightManager::LightManager(const std::string & file)
 {
@@ -8,7 +9,7 @@ LightManager::LightManager(const std::string & file)
 	while (true)
 	{
 		managed light;
-		light.id = list.size();
+		light.id = (unsigned int)list.size();
 		GetPrivateProfileString(Utilities::xToString<unsigned int>(list.size()).c_str(), "r", "0", buff, 99, file.c_str());
 		light.r = atoi(buff);
 		GetPrivateProfileString(Utilities::xToString<unsigned int>(list.size()).c_str(), "g", "0", buff, 99, file.c_str());
@@ -77,7 +78,11 @@ void				LightManager::tick(Vector3 pos, float distance) const
 	while (it != list.end())
 	{
 		if (!(*it).spot && GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS((*it).pos.x, (*it).pos.y, (*it).pos.z, pos.x, pos.y, pos.z, true) < distance)
-			GRAPHICS::DRAW_LIGHT_WITH_RANGE((*it).pos.x, (*it).pos.y, (*it).pos.z, (*it).r, (*it).g, (*it).b, (*it).range, (*it).intensity);
+		{
+			//GRAPHICS::DRAW_LIGHT_WITH_RANGE((*it).pos.x, (*it).pos.y, (*it).pos.z, (*it).r, (*it).g, (*it).b, (*it).range, (*it).intensity);
+			GRAPHICS::DRAW_SPOT_LIGHT((*it).pos.x, (*it).pos.y, (*it).pos.z - 0.2f, 0, 0, 1, (*it).r, (*it).g, (*it).b, (*it).range * 2.0f, (*it).intensity * 2.0f, 30.0f, 200.0f, (*it).range * 2.0f);
+			GRAPHICS::DRAW_SPOT_LIGHT((*it).pos.x, (*it).pos.y, (*it).pos.z + 0.2f, 0, 0, -1, (*it).r, (*it).g, (*it).b, (*it).range * 2.0f, (*it).intensity * 2.0f, 30.0f, 200.0f, (*it).range * 2.0f);
+		}
 		it++;
 	}
 }

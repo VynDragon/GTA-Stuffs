@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include "Defines.h"
 #include "..\Common\script.h"
+#include "..\Common\Utilities.h"
 
 OptionManager OptionManager::options;
 

@@ -22,6 +22,7 @@
     <ClInclude Include="..\Common\KeyManager.h" />
     <ClInclude Include="..\Common\Menu.h" />
     <ClInclude Include="..\Common\Props.h" />
+    <ClInclude Include="..\Common\Wrecks.h" />
     <ClInclude Include="LightManager.h" />
     <ClInclude Include="Manager.h" />
   </ItemGroup>

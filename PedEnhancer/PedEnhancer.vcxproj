@@ -7,6 +7,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Common\Groups.cpp" />
     <ClCompile Include="..\Common\Kamikaze_Menu.cpp" />
     <ClCompile Include="..\Common\keyboard.cpp" />
     <ClCompile Include="..\Common\KeyManager.cpp" />
@@ -17,10 +18,15 @@
     <ClCompile Include="script.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\Ammos.h" />
+    <ClInclude Include="..\Common\Groups.h" />
     <ClInclude Include="..\Common\Kamikaze_Menu.h" />
     <ClInclude Include="..\Common\KeyManager.h" />
     <ClInclude Include="..\Common\Menu.h" />
+    <ClInclude Include="..\Common\MilitaryModels.h" />
     <ClInclude Include="..\Common\script.h" />
+    <ClInclude Include="..\Common\Utilities.h" />
+    <ClInclude Include="..\inc\enums.h" />
     <ClInclude Include="PedManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

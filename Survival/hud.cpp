@@ -2,6 +2,7 @@
 #include "ContainerManager.h"
 #include "..\Common\Keys.h"
 #include "OptionManager.h"
+#include "..\Common\Utilities.h"
 
 Hud::Hud(PlayerStatus *player)
 {
@@ -39,23 +40,20 @@ void		Hud::draw()
 	Utilities::drawRectangle(x, y + 0.043f, 0.2f * player->getFood(), 0.0150f, color, 1.0f);
 	color.y = 0.0f;
 	Utilities::drawRectangle(x, y + 0.022f, 0.001f, 0.0530f, color, 1.0f);
+	Hash wep;
+	WEAPON::GET_CURRENT_PED_WEAPON(player->getId(), &wep, true);
+	if (!(PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::PLAYER_ID()) &&
+		(wep == Utilities::get_hash("WEAPON_MARKSMANRIFLE") ||
+			wep == Utilities::get_hash("WEAPON_SNIPERRIFLE") ||
+			wep == Utilities::get_hash("WEAPON_HEAVYSNIPER")
+			)))
+	{
+		UI::HIDE_HUD_AND_RADAR_THIS_FRAME();
+	}
+	else
+		UI::_DISABLE_RADAR_THIS_FRAME();
 	if (GetTickCount() > weapon_timer)
 	{
-		Hash wep;
-		WEAPON::GET_CURRENT_PED_WEAPON(player->getId(), &wep, true);
-		if (PLAYER::IS_PLAYER_FREE_AIMING(PLAYER::PLAYER_ID()) &&
-			(wep == Utilities::get_hash("WEAPON_MARKSMANRIFLE") ||
-				wep == Utilities::get_hash("WEAPON_SNIPERRIFLE") ||
-				wep == Utilities::get_hash("WEAPON_HEAVYSNIPER")
-				))
-		{
-			UI::DISPLAY_HUD(true);
-		}
-		else
-		{
-			UI::DISPLAY_HUD(false);
-			UI::DISPLAY_RADAR(false);
-		}
 		actualize_weapons();
 		weapon_timer = GetTickCount() + WEAPON_ACTUALIZATION_DELAY;
 	}

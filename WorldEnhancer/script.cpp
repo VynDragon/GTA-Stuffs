@@ -9,6 +9,7 @@
 #include "..\Common\Kamikaze_Menu.h"
 #include "..\Common\Props.h"
 #include "..\Common\Keys.h"
+#include "..\Common\Utilities.h"
 #include "LightManager.h"
 
 static Manager<Decoration>::managed	*currentMovable = NULL;
@@ -18,10 +19,18 @@ static Manager<Decoration>::managed	*currentMovable = NULL;
 
 // Menu functions
 
-void		spawnProp(void *baseManager, const void *str)
+void					spawnProp(void *baseManager, const void *str)
 {
 	Manager<Decoration>	*base = (Manager<Decoration>*)baseManager;
 	const std::string	*name = (const std::string*)str;
+	Vector3	plcoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+	base->add(new Decoration(*name, plcoords.x, plcoords.y, plcoords.z + 1.0f, (float)(rand() % 360)), true);
+}
+
+void					spawnHashedProp(void *baseManager, const void *str)
+{
+	Manager<Decoration>	*base = (Manager<Decoration>*)baseManager;
+	Hash				*name = (Hash*)str;
 	Vector3	plcoords = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
 	base->add(new Decoration(*name, plcoords.x, plcoords.y, plcoords.z + 1.0f, (float)(rand() % 360)), true);
 }
@@ -36,7 +45,7 @@ void								setCurrentMovable(void *object, const void *str)
 
 void main(bool devMode, float enhancerRenderDistance, float distanceBetweenWrecks)
 {
-	Manager<Decoration>	carManager(".\\Cars.ini");
+	Manager<Decoration>	carManager(".\\Cars.ini", false);
 	Manager<Decoration>	baseManager(".\\Bases.ini");
 	LightManager		lightManager(".\\Lights.ini");
 	DWORD				longTick = GetTickCount(), longTickb = GetTickCount();
@@ -63,13 +72,13 @@ void main(bool devMode, float enhancerRenderDistance, float distanceBetweenWreck
 					}
 				}
 			//}
-			carManager.tick(plcoords, enhancerRenderDistance);
+			carManager.tick(plcoords, enhancerRenderDistance, devMode);
 			longTick = GetTickCount() + 10;
 		}
 		// bases
 		if (GetTickCount() > longTickb)
 		{
-			baseManager.tick(plcoords, enhancerRenderDistance);
+			baseManager.tick(plcoords, enhancerRenderDistance, devMode);
 			longTickb = GetTickCount() + 100;
 		}
 		lightManager.tick(plcoords, enhancerRenderDistance);
@@ -94,6 +103,12 @@ void main(bool devMode, float enhancerRenderDistance, float distanceBetweenWreck
 				{
 					men->add_entry(*it, spawnProp, &baseManager, &(*it));
 					it++;
+				}
+				auto			itb = hashedProps.begin();
+				while (itb != hashedProps.end())
+				{
+					men->add_entry(Utilities::xToString<Hash>(*itb), spawnHashedProp, &baseManager, &(*itb));
+					itb++;
 				}
 				Menu::show(men);
 			}
