@@ -131,7 +131,7 @@ public:
 						STREAMING::REQUEST_MODEL(attachhash);
 						/*while (!STREAMING::HAS_MODEL_LOADED(attachhash))
 							WAIT(0);*/
-						(*it).object = OBJECT::CREATE_OBJECT(attachhash, (*it).that->getCoords().x, (*it).that->getCoords().y, (*it).that->getCoords().z, 1, false, false);
+						(*it).object = OBJECT::CREATE_OBJECT(attachhash, (*it).that->getCoords().x, (*it).that->getCoords().y, (*it).that->getCoords().z, 1, true, false);
 					}
 				}
 				else
@@ -140,7 +140,7 @@ public:
 						STREAMING::REQUEST_MODEL((*it).that->getHash());
 						/*while (!STREAMING::HAS_MODEL_LOADED((*it).that->getHash()))
 							WAIT(0);*/
-						(*it).object = OBJECT::CREATE_OBJECT((*it).that->getHash(), (*it).that->getCoords().x, (*it).that->getCoords().y, (*it).that->getCoords().z, 1, false, false);
+						(*it).object = OBJECT::CREATE_OBJECT((*it).that->getHash(), (*it).that->getCoords().x, (*it).that->getCoords().y, (*it).that->getCoords().z, 1, true, false);
 					}
 				}
 				if ((*it).object != 0)
@@ -156,7 +156,7 @@ public:
 						(*it).blip = UI::ADD_BLIP_FOR_ENTITY((*it).object);
 				}
 				else
-					Utilities::notify("invalid model");
+					Utilities::notify((*it).that->getModelName() + " :invalid model");
 				loaded.push_back(*it);
 				unloaded.erase(it);
 				break;

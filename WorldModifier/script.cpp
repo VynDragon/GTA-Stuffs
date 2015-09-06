@@ -39,14 +39,6 @@
 	* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-void		log_text(const std::string &str)
-{
-	std::fstream file("log.txt", std::ios_base::out | std::ios_base::in | std::ios_base::app);
-
-	file << str;
-	file.close();
-}
-
 intptr_t						get_address_by_pattern_text(uint8_t *pattern, uint8_t *mask, uint32_t length) // function that scan the memory for a pattern, it scan by uint8_t (byte by byte)
 {
 	uintptr_t					current = NULL;
@@ -128,7 +120,7 @@ void	GET_THE_FUCKING_SNOW_MATE(memory_data *data, bool enable) // MAKE IT RAIN
 	}
 }
 
-void main(bool snow)
+void main(bool snow, bool xmasWeather)
 {
 	DWORD		actualizeWeatherTime = GetTickCount();
 	DWORD		actualizeVehicules = GetTickCount();
@@ -151,6 +143,11 @@ void main(bool snow)
 	txt = Utilities::xToString<float>(fov) + "\n";
 	log_text(txt);*/
 	//VirtualProtect(fov, sizeof(float), PAGE_EXECUTE_READWRITE, nullptr);
+	/*nativeInit(0x10FAB35428CCC9D7);
+	uintptr_t	ptr = (uintptr_t)nativeCall;
+	Utilities::log_text(Utilities::xToString<void*>((void*)(ptr)) + "\n");
+	for (uintptr_t i = (uintptr_t)ptr; i < (uintptr_t)ptr + 800; i += 8)
+		Utilities::log_text(Utilities::xToString<void*>((void*)(*(uintptr_t*)i)));*/
 	UI::DISPLAY_RADAR(true);
 	UI::DISPLAY_HUD(true);
 	while (true)
@@ -169,15 +166,25 @@ void main(bool snow)
 		VEHICLE::SET_RANDOM_TRAINS(false);
 		VEHICLE::SET_RANDOM_BOATS(false);
 		VEHICLE::SET_GARBAGE_TRUCKS(false);
+		STREAMING::SET_VEHICLE_POPULATION_BUDGET(0);
 		PLAYER::CLEAR_PLAYER_WANTED_LEVEL(PLAYER::PLAYER_ID());
+		PLAYER::SET_MAX_WANTED_LEVEL(0);
 		GRAPHICS::DISABLE_VEHICLE_DISTANTLIGHTS(true);
 		if (actualizeWeatherTime < GetTickCount())
 		{
 			if (snow)
 			{
 				GRAPHICS::_SET_BLACKOUT(true);
-				GAMEPLAY::SET_OVERRIDE_WEATHER("BLIZZARD");
-				GAMEPLAY::SET_WEATHER_TYPE_NOW_PERSIST("BLIZZARD");
+				if (xmasWeather)
+				{
+					GAMEPLAY::SET_OVERRIDE_WEATHER("XMAS");
+					GAMEPLAY::SET_WEATHER_TYPE_NOW_PERSIST("XMAS");
+				}
+				else
+				{
+					GAMEPLAY::SET_OVERRIDE_WEATHER("BLIZZARD");
+					GAMEPLAY::SET_WEATHER_TYPE_NOW_PERSIST("BLIZZARD");
+				}
 				GAMEPLAY::_SET_CLOUD_HAT_TRANSITION("Snowy 01", 0);
 			}
 			else
@@ -210,7 +217,7 @@ void main(bool snow)
 			if (!VEHICLE::_IS_HEADLIGHT_L_BROKEN(vehicles[i]) && on)
 				GRAPHICS::DRAW_SPOT_LIGHT(pos.x - left.x + forward.x, pos.y - left.y + forward.y, pos.z - left.z + forward.z, newforward.x, newforward.y, newforward.z, 255, 255, 255, 25.0f, 5.0f, 5.0f, 15.0f, 1.0f);
 			if (!VEHICLE::_IS_HEADLIGHT_R_BROKEN(vehicles[i]) && on)
-				GRAPHICS::DRAW_SPOT_LIGHT(pos.x + left.x + forward.x, pos.y + left.y + forward.y, pos.z + left.z + forward.z, newforward.x, newforward.y, newforward.z, 255, 255, 255, 25.0f, 5.0f, 5.0f, 15.0f, 8.0f);
+				GRAPHICS::DRAW_SPOT_LIGHT(pos.x + left.x + forward.x, pos.y + left.y + forward.y, pos.z + left.z + forward.z, newforward.x, newforward.y, newforward.z, 255, 255, 255, 25.0f, 5.0f, 5.0f, 15.0f, 0.5f);
 			/*VEHICLE::SET_VEHICLE_LIGHT_MULTIPLIER(vehicles[i], 1.0f);
 			VEHICLE::SET_VEHICLE_LIGHTS(vehicles[i], 2);*/
 		}
@@ -219,22 +226,22 @@ void main(bool snow)
 		{
 			Utilities::putText(Utilities::xToString<Hash>(ENTITY::GET_ENTITY_MODEL(entity)), 0.5f, 0.5f);
 		}*/
+		//Utilities::putText(Utilities::xToString<float>(plcoords.x) + "," + Utilities::xToString<float>(plcoords.y) + "," + Utilities::xToString<float>(plcoords.z), 0.5f, 0.5f);
 		WAIT(0);
 	}
 }
 
 void ScriptMain()
 {
-	bool		snow = false;
+	bool		snow = false, xmasWeather = false;
 	memory_data	data;
 	srand(GetTickCount());
-	char	buff[10];
-	GetPrivateProfileString("Options", "snow", "1", buff, 9, ".\\options.ini");
-	if (!strcmp("1", buff))
-	{
+	snow = Utilities::getFromFile<bool>(".\\Options.ini", "Options", "snow", true);
+	if (snow)
 		WritePrivateProfileString("Options", "snow", "1", ".\\options.ini");
-		snow = true;
-	}
+	xmasWeather = Utilities::getFromFile<bool>(".\\Options.ini", "Options", "xmasWeather", false);
+	if (!xmasWeather)
+		Utilities::writeToFile<bool>(".\\Options.ini", "Options", "xmasWeather", false);
 	GET_THE_FUCKING_SNOW_MATE(&data, snow);
-	main(snow);
+	main(snow, xmasWeather);
 }

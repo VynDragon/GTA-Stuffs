@@ -6,7 +6,7 @@
 
 namespace Utilities
 {
-	void				notify(const std::string &str);
+	int				notify(const std::string &str);
 	std::string			floatToString(float f);
 	template<typename T>
 	std::string				xToString(T x)

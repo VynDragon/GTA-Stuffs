@@ -1,7 +1,7 @@
 #include "Menu.h"
 #include "Utilities.h"
 
-Menu	*Menu::currentMenu;
+Menu	*Menu::currentMenu = NULL;
 
 Menu::Menu()
 {

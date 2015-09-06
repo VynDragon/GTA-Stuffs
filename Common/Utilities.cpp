@@ -5,7 +5,7 @@
 namespace Utilities
 {
 
-	void			notify(const std::string &str)
+	int			notify(const std::string &str)
 	{
 		char		buff[500];
 
@@ -13,7 +13,7 @@ namespace Utilities
 		buff[str.length()] = 0;
 		UI::_SET_NOTIFICATION_TEXT_ENTRY("STRING");
 		UI::_ADD_TEXT_COMPONENT_STRING(buff);
-		UI::_DRAW_NOTIFICATION(false, false);
+		return (UI::_DRAW_NOTIFICATION(false, false));
 	}
 
 	std::string				floatToString(float f)
@@ -67,7 +67,7 @@ namespace Utilities
 			while (!STREAMING::HAS_MODEL_LOADED(attachhash)) {
 				WAIT(0);
 			}
-			Object o = OBJECT::CREATE_OBJECT(attachhash, pos.x, pos.y, pos.z + 0.1f, 1, 1, 1);
+			Object o = OBJECT::CREATE_OBJECT(attachhash, pos.x, pos.y, pos.z + 0.1f, true, true, false);
 			return (o);
 		}
 		return (false);

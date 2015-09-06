@@ -13,6 +13,7 @@
     <ClCompile Include="Zombie.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\ZombieModels.h" />
     <ClInclude Include="..\Common\Zones.h" />
     <ClInclude Include="..\inc\enums.h" />
     <ClInclude Include="..\inc\natives.h" />

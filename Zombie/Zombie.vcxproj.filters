@@ -12,6 +12,7 @@
     <ClInclude Include="..\inc\natives.h" />
     <ClInclude Include="..\inc\types.h" />
     <ClInclude Include="..\Common\Zones.h" />
+    <ClInclude Include="..\Common\ZombieModels.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

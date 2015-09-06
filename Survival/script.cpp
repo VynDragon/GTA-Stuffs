@@ -55,6 +55,7 @@ void main()
 	ContainerManager::setCurrent(&containerManager);
 	while (true)
 	{
+		OutputDebugString("start tick");
 		// pre tick setup
 		PLAYER::_SET_PLAYER_HEALTH_REGENERATION_RATE(PLAYER::PLAYER_ID(), 0.0f);
 		// menu switch
@@ -76,14 +77,17 @@ void main()
 		// all else go here
 		OptionManager::options.tick();
 		KeyManager::keys.tick();
-		hud->draw();
+		OutputDebugString("start player tick");
 		player->tick();
+		OutputDebugString("end player tick");
+		hud->draw();
 		if (GetTickCount() > longTick)
 		{
 			containerManager.tick(player->getPos());
 			longTick = GetTickCount() + 600;
 		}
 		// look like that WAIT is important
+		OutputDebugString("end tick");
 		WAIT(0);
 	}
 }
@@ -91,25 +95,11 @@ void main()
 void ScriptMain()
 {
 	DWORD waitforready = GetTickCount() + 5000;
-	std::fstream	file("./log.txt", std::ios_base::out);
 	srand(GetTickCount());
 	GRAPHICS::CLEAR_DRAW_ORIGIN();
 	/*GAMEPLAY::_DISABLE_AUTOMATIC_RESPAWN(true);
 	GAMEPLAY::SET_FADE_IN_AFTER_DEATH_ARREST(false);*/
-	try
-	{
-		while (GetTickCount() < waitforready)
-			WAIT(0);
-		main();
-	}
-	catch (std::exception &e)
-	{
-		file << e.what();
-		file.close();
-	}
-	catch (...)
-	{
-		file << "something...";
-		file.close();
-	}
+	while (GetTickCount() < waitforready)
+		WAIT(0);
+	main();
 }

@@ -4,13 +4,24 @@
 #include "..\Common\Utilities.h"
 
 
+float	get_random_mul(void)
+{
+	int i = rand() % 3 - 1;
+
+	while (i == 0)
+		i = rand() % 3 - 1;
+	return ((float)i);
+}
 
 PedStatus::PedStatus(Ped playerId)
 {
 	food = STATLIMIT;
 	water = STATLIMIT;
 	this->pedId = pedId;
+	lastPedId = 0;
+	moved = false;
 	time = GetTickCount();
+	respawnTimer = 0;
 }
 
 
@@ -49,6 +60,18 @@ Ped		PedStatus::getId(void)
 
 int PedStatus::doTick(void)
 {
+	OutputDebugString("entering player dotick");
+	if (moved && respawnTimer < GetTickCount())
+	{
+		Vector3	po = this->getPos();
+		if (GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(targetPos.x, targetPos.y, targetPos.z, po.x, po.y, po.z, true) < 10.0f)
+		{
+			moved = false;
+			respawnTimer = 0;
+		}
+		else
+			ENTITY::SET_ENTITY_COORDS(pedId, targetPos.x, targetPos.y, targetPos.z, true, true, true, true);
+	}
 	if (PED::_IS_PED_DEAD(pedId, true) && !dead)
 	{
 		food = STATLIMIT;
@@ -72,6 +95,24 @@ int PedStatus::doTick(void)
 		ContainerManager::current->addCrate(true, in, this->getPos());
 		in = Inventory::emptyInventory; // this actually deallocate the stuffs;
 		dead = true;
+		Vector3	pos = this->getPos();
+		Vector3 out;
+		do
+		{
+			float	x = pos.x + (float)(get_random_mul() * (rand() % 120 + 100.0f)), y = pos.y + (float)(get_random_mul() * (rand() % 120 + 100.0f)), z = 0;
+			GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(x, y, pos.z + 10.0f, &z);
+			WAIT(100);
+			if (z <= 0)
+				GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(x, y, pos.z + 1000.0f, &z);
+			targetPos.z = z + 1.0f;
+			targetPos.x = x;
+			targetPos.y = y;
+		} while (!PATHFIND::GET_SAFE_COORD_FOR_PED(targetPos.x, targetPos.y, targetPos.z, false, &out, 0));
+		targetPos.x = out.x;
+		targetPos.y = out.y;
+		targetPos.z = out.z;
+		moved = true;
+		respawnTimer = GetTickCount() + 20000;
 	}
 	else if (!PED::_IS_PED_DEAD(pedId, true))
 		dead = false;
@@ -85,6 +126,7 @@ int PedStatus::doTick(void)
 	else if (food < LOSSLIMIT || water < LOSSLIMIT)
 		ENTITY::SET_ENTITY_HEALTH(pedId, ENTITY::GET_ENTITY_HEALTH(pedId) -LOSSRATE);
 	time = GetTickCount() + TICK_LENGTH;
+	OutputDebugString("exiting player dotick");
 	return (0);
 }
 

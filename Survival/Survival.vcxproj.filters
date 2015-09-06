@@ -43,6 +43,7 @@
     <ClInclude Include="..\Common\script.h" />
     <ClInclude Include="..\Common\Weapons.h" />
     <ClInclude Include="..\Common\KeyManager.h" />
+    <ClInclude Include="..\Common\Utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

@@ -33,6 +33,7 @@
     <ClInclude Include="..\Common\Keys.h" />
     <ClInclude Include="..\Common\Menu.h" />
     <ClInclude Include="..\Common\script.h" />
+    <ClInclude Include="..\Common\Utilities.h" />
     <ClInclude Include="..\Common\Weapons.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="ContainerManager.h" />

@@ -4,6 +4,7 @@
 #include "..\Common\ZombieModels.h"
 #include "..\Common\Animations.h"
 #include "..\Common\Zones.h"
+#include "..\Common\ZombieModels.h"
 #include <fstream>
 
 namespace Zombie
@@ -144,10 +145,10 @@ namespace Zombie
 		return ((float)i);
 	}
 
-	void				place_random_zombie_near(Vector3 point, float mulZombie)
+	void				place_random_zombie_near(Vector3 point, float mulZombie, bool fivem)
 	{
 		zone			here = get_zone_by_name(ZONE::GET_NAME_OF_ZONE(point.x, point.y, point.z));
-		unsigned int	max_zombies = (unsigned int)(here.zombieMul * mulZombie);
+		unsigned int	max_zombies = (unsigned int)(here.zombieMul * mulZombie * (fivem ? 0.5f : 1.0f));
 		if (zombies.size() <  max_zombies)
 		{
 			int zombiesthisframe = 0;
@@ -156,7 +157,7 @@ namespace Zombie
 				float	x = point.x + (float)(get_random_mul() * (rand() % 70 + 10.0f)), y = point.y + (float)(get_random_mul() * (rand() % 70 + 10.0f)), z = 0;
 				GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(x, y, point.z, &z);
 				if (z <= 0)
-					GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(x, y, point.z + 500.0f, &z);
+					GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(x, y, point.z + 1000.0f, &z);
 				if (z <= 0)
 					return;
 				if (!CAM::IS_SPHERE_VISIBLE(x, y, z, 1.0) && !INTERIOR::GET_INTERIOR_FROM_COLLISION(x, y, z))
@@ -180,7 +181,11 @@ namespace Zombie
 					if (timeout >= 100)
 						return;*/
 						//Ped i = PED::CREATE_PED(26, skin_hash, x, y, z, (float)(rand() % 360), true, true);
-					Ped i = PED::CREATE_RANDOM_PED(x, y, z);
+					Ped	i;
+					if (NETWORK::NETWORK_IS_SESSION_STARTED())
+						i = PED::CREATE_PED(26, Utilities::get_hash(zombieModels[rand() % zombieModels.size()]), x, y, z, (float)(rand() % 360), true, false);
+					else
+						i = PED::CREATE_RANDOM_PED(x, y, z);
 					zombies.push_back(i);
 					PED::SET_PED_MOVEMENT_CLIPSET(i, animation, 0x3e800000);
 					PED::SET_PED_DIES_WHEN_INJURED(i, false);
@@ -204,6 +209,8 @@ namespace Zombie
 					AI::SET_PED_PATH_AVOID_FIRE(i, false);
 					PED::SET_PED_SEEING_RANGE(i, 8.0f);
 					PED::SET_PED_KEEP_TASK(i, true);
+					PED::SET_PED_CAN_PLAY_AMBIENT_ANIMS(i, false);
+					PED::SET_PED_CAN_EVASIVE_DIVE(i, false);
 					PED::SET_PED_ALERTNESS(i, 3);
 				}
 				zombiesthisframe++;
@@ -222,7 +229,7 @@ namespace Zombie
 	{
 		DWORD			longTick = GetTickCount(), longTickb = GetTickCount();
 		DWORD			waitforready = GetTickCount() + 2000;
-		bool			devMode;
+		bool			devMode, fivem;
 		float			mulZombie;
 		srand(GetTickCount());
 
@@ -238,14 +245,20 @@ namespace Zombie
 			GetPrivateProfileString("Options", "mulZombie", "100", buff, 99, "./options.ini");
 			mulZombie = (float)atof(buff);
 			WritePrivateProfileString("Options", "mulZombie", buff, "./options.ini");
+			fivem = Utilities::getFromFile<bool>(".\\Options.ini", "Options", "fivem", false);
+			if (fivem == false)
+				Utilities::writeToFile<bool>(".\\Options.ini", "Options", "fivem", false);
 		}
+		if (fivem == true)
+			while (!NETWORK::NETWORK_IS_SESSION_STARTED())
+				WAIT(0);
 		while (true)
 		{
 			PLAYER::SET_PLAYER_NOISE_MULTIPLIER(PLAYER::PLAYER_ID(), 2.0f);
 			auto plcoords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED(PLAYER::PLAYER_ID()), true);
 			if (GetTickCount() > longTick)
 			{
-				Zombie::place_random_zombie_near(plcoords, mulZombie);
+				Zombie::place_random_zombie_near(plcoords, mulZombie, fivem);
 				longTick = GetTickCount() + 600;
 			}
 			if (GetTickCount() > longTickb)

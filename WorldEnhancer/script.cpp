@@ -43,7 +43,7 @@ void								setCurrentMovable(void *object, const void *str)
 
 // end
 
-void main(bool devMode, float enhancerRenderDistance, float distanceBetweenWrecks)
+void main(bool devMode, float enhancerRenderDistance, unsigned int wreckDensity)
 {
 	Manager<Decoration>	carManager(".\\Cars.ini", false);
 	Manager<Decoration>	baseManager(".\\Bases.ini");
@@ -60,26 +60,26 @@ void main(bool devMode, float enhancerRenderDistance, float distanceBetweenWreck
 			float	outh;
 			/*if (PATHFIND::GET_RANDOM_VEHICLE_NODE(plcoords.x, plcoords.y, plcoords.z, 100.0f, true, true, true, &out, &outh))
 			{*/
-				if (PATHFIND::GET_SAFE_COORD_FOR_PED(plcoords.x + rand() % 120 - 60, plcoords.y + rand() % 120 - 60, plcoords.z, false, &outb, 0))
+				if (PATHFIND::GET_SAFE_COORD_FOR_PED(plcoords.x + rand() % 180 - 90, plcoords.y + rand() % 180 - 90, plcoords.z, false, &outb, 0))
 				{
-					if (PATHFIND::IS_POINT_ON_ROAD(outb.x, outb.y, outb.z, 0))
+					if (PATHFIND::IS_POINT_ON_ROAD(outb.x, outb.y, outb.z, 0) && !CAM::IS_SPHERE_VISIBLE(outb.x, outb.y, out.z + 2.0f, 10.0f) && GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(outb.x, outb.y, out.z, plcoords.x, plcoords.y, plcoords.z, true) > 50.0f)
 					{
-						Manager<Decoration>::managed nearest = carManager.getNearest(outb);
-						if (nearest.that != NULL ?
-							GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(nearest.that->getCoords().x, nearest.that->getCoords().y, nearest.that->getCoords().z, outb.x, outb.y, outb.z, true) > distanceBetweenWrecks
-							: true)
+						if (carManager.getLoaded()->size() < wreckDensity)
+						{
 							carManager.add(new Decoration(carWrecks[rand() % carWrecks.size()], outb.x, outb.y, outb.z, (float)(rand() % 360)), true);
+							carManager.tick(plcoords, enhancerRenderDistance + 20.0f, devMode);
+						}
 					}
 				}
 			//}
-			carManager.tick(plcoords, enhancerRenderDistance, devMode);
-			longTick = GetTickCount() + 10;
+			longTick = GetTickCount() + 100;
 		}
 		// bases
 		if (GetTickCount() > longTickb)
 		{
+			carManager.tick(plcoords, enhancerRenderDistance + 20.0f, devMode);
 			baseManager.tick(plcoords, enhancerRenderDistance, devMode);
-			longTickb = GetTickCount() + 100;
+			longTickb = GetTickCount() + 10;
 		}
 		lightManager.tick(plcoords, enhancerRenderDistance);
 		//devmode
@@ -180,10 +180,12 @@ void main(bool devMode, float enhancerRenderDistance, float distanceBetweenWreck
 	}
 }
 
-void ScriptMain()
+void				ScriptMain()
 {
-	bool	devMode;
-	float	enhancerRenderDistance, distanceBetweenWrecks;
+	bool			devMode;
+	float			enhancerRenderDistance;
+	unsigned int	wreckDensity;
+
 	{
 		char	buff[100];
 		GetPrivateProfileString("Options", "devMode", "0", buff, 99, "./options.ini");
@@ -195,11 +197,11 @@ void ScriptMain()
 		enhancerRenderDistance = (float)atof(buff);
 		if (enhancerRenderDistance == 150.0f)
 			WritePrivateProfileString("Options", "enhancerRenderDistance", "150", "./options.ini");
-		GetPrivateProfileString("Options", "distanceBetweenWrecks", "50", buff, 99, "./options.ini");
-		distanceBetweenWrecks = (float)atof(buff);
-		if (distanceBetweenWrecks == 50.0f)
-			WritePrivateProfileString("Options", "distanceBetweenWrecks", "50", "./options.ini");
+		GetPrivateProfileString("Options", "wreckDensity", "50", buff, 99, "./options.ini");
+		wreckDensity = std::stoul(buff);
+		if (wreckDensity == 100)
+			WritePrivateProfileString("Options", "wreckDensity", "50", "./options.ini");
 	}
 	srand(GetTickCount());
-	main(devMode, enhancerRenderDistance, distanceBetweenWrecks);
+	main(devMode, enhancerRenderDistance, wreckDensity);
 }
