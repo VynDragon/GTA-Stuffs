@@ -5,6 +5,7 @@
     <ClCompile Include="Zombie.cpp" />
     <ClCompile Include="..\Common\Utilities.cpp" />
     <ClCompile Include="..\Common\keyboard.cpp" />
+    <ClCompile Include="..\Common\Groups.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Zombie.h" />
@@ -13,6 +14,7 @@
     <ClInclude Include="..\inc\types.h" />
     <ClInclude Include="..\Common\Zones.h" />
     <ClInclude Include="..\Common\ZombieModels.h" />
+    <ClInclude Include="..\Common\Groups.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="include">

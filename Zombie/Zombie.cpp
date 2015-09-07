@@ -5,10 +5,29 @@
 #include "..\Common\Animations.h"
 #include "..\Common\Zones.h"
 #include "..\Common\ZombieModels.h"
+#include "..\Common\Groups.h"
 #include <fstream>
 
 namespace Zombie
 {
+	struct managed
+	{
+		Ped		zombie;
+		DWORD	lastUpdate;
+	};
+	int		get_free_seat(Vehicle veh)
+	{
+		int i = -1;
+		while (i < VEHICLE::GET_VEHICLE_MAX_NUMBER_OF_PASSENGERS(veh))
+		{
+			if (VEHICLE::IS_VEHICLE_SEAT_FREE(veh, i))
+			{
+				return (i);
+			}
+			i++;
+		}
+	}
+
 	Ped		is_headtracking_which_player_ped(Ped ped) // return the player targeted, we only care about many ped attacking another ped if that ped is player, normal ped can just get their 1 or 2 zombies
 	{
 		if (PLAYER::IS_PLAYER_ONLINE())
@@ -28,7 +47,7 @@ namespace Zombie
 				return (-1);
 		}
 	}
-	static std::vector<Ped>	zombies;
+	static std::vector<managed>	zombies;
 	void		zombify_nearby_ped(Ped id) // shitfunction
 	{
 		int		skin_hash = Utilities::get_hash("u_m_y_zombie_01");
@@ -65,12 +84,12 @@ namespace Zombie
 			auto it = zombies.begin();
 			while (it != zombies.end() && !foundDeletable)
 			{
-				if (ENTITY::IS_AN_ENTITY(*it))
+				if (ENTITY::IS_AN_ENTITY((*it).zombie))
 				{
-					Vector3 pos = ENTITY::GET_ENTITY_COORDS(*it, true);
-					if ((GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(pos.x, pos.y, pos.z, point.x, point.y, point.z, true) > ZOMBIE_CLEANING_DISTANCE || PED::_IS_PED_DEAD(*it, true)) && !CAM::IS_SPHERE_VISIBLE(pos.x, pos.y, pos.z, 1.0))
+					Vector3 pos = ENTITY::GET_ENTITY_COORDS((*it).zombie, true);
+					if ((GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(pos.x, pos.y, pos.z, point.x, point.y, point.z, true) > ZOMBIE_CLEANING_DISTANCE || PED::_IS_PED_DEAD((*it).zombie, true)) && !CAM::IS_SPHERE_VISIBLE(pos.x, pos.y, pos.z, 1.0))
 					{
-						PED::DELETE_PED(&(*it));
+						PED::DELETE_PED(&((*it).zombie));
 						zombies.erase(it);
 						foundDeletable = true;
 					}
@@ -93,47 +112,53 @@ namespace Zombie
 	}
 
 
-	void		actualize_attacks(void)
+	int		actualize_attacks_return_near(float nearRange)
 	{
 		auto	it = zombies.begin();
+		int		nb = 0;
+
 		while (it != zombies.end())
 		{
-			if (ENTITY::IS_AN_ENTITY(*it))
-				if (!PED::_IS_PED_DEAD(*it, true))
+			if (ENTITY::IS_AN_ENTITY((*it).zombie))
+				if (!PED::_IS_PED_DEAD((*it).zombie, true))
 				{
 					Any	bone;
-					//if (target != -1)
-					/*Ped target = PLAYER::PLAYER_PED_ID();
-					Vector3	tCoords = ENTITY::GET_ENTITY_COORDS(target, true);
-					Vector3	pCoords = ENTITY::GET_ENTITY_COORDS(*it, true);
-					if (PED::IS_PED_IN_ANY_VEHICLE(*it, true))
-						AI::TASK_LEAVE_ANY_VEHICLE(*it, true, true);
-					if (PED::IS_PED_IN_ANY_VEHICLE(target, false) && GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(tCoords.x, tCoords.y, tCoords.z, pCoords.x, pCoords.y, pCoords.z, true) < 10.0f)
+					if (PED::IS_PED_IN_ANY_VEHICLE((*it).zombie, true))
+						AI::CLEAR_PED_TASKS_IMMEDIATELY((*it).zombie);
+					Ped target = PLAYER::PLAYER_PED_ID();
+					if (ENTITY::IS_AN_ENTITY(target) ? PED::IS_PED_IN_ANY_VEHICLE(target, false) && (*it).lastUpdate < GetTickCount() : false)
 					{
-						AI::CLEAR_PED_TASKS(*it);
-						AI::CLEAR_PED_SECONDARY_TASK(*it);
-						PED::SET_PED_KEEP_TASK(*it, false);
-						AI::TASK_ENTER_VEHICLE(*it, PED::GET_VEHICLE_PED_IS_IN(target, false), -1, -1, 2.0f, 1, 0);
-						PED::SET_PED_KEEP_TASK(*it, true);
-					}*/
-					if (PED::IS_PED_STOPPED(*it))
-					{
-						AI::CLEAR_PED_TASKS(*it);
-						AI::CLEAR_PED_SECONDARY_TASK(*it);
-						PED::SET_PED_KEEP_TASK(*it, false);
-						PED::REGISTER_HATED_TARGETS_AROUND_PED(*it, HEAR_RANGE);
-						if (!PED::IS_PED_IN_COMBAT(*it, true))
-							AI::TASK_WANDER_STANDARD(*it, 0x471c4000, 0);
-						PED::SET_PED_KEEP_TASK(*it, true);
+						Vector3 tCoords = ENTITY::GET_ENTITY_COORDS(target, true);
+						Vector3	pCoords = ENTITY::GET_ENTITY_COORDS((*it).zombie, true);
+						if (GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(tCoords.x, tCoords.y, tCoords.z, pCoords.x, pCoords.y, pCoords.z, true) < 3.0f)
+							nb++;
+						if (PED::IS_PED_IN_ANY_VEHICLE(target, false))
+						{
+							AI::TASK_GO_STRAIGHT_TO_COORD((*it).zombie, tCoords.x, tCoords.y, tCoords.z, 2.0f, 10000, rand() % 360, 0.0f);
+						}
+						(*it).lastUpdate = GetTickCount() + 100;
 					}
-					if (PED::GET_PED_LAST_DAMAGE_BONE(*it, &bone))
+					if (PED::IS_PED_STOPPED((*it).zombie) && (*it).lastUpdate < GetTickCount())
+					{
+						AI::CLEAR_PED_TASKS((*it).zombie);
+						AI::CLEAR_PED_SECONDARY_TASK((*it).zombie);
+						PED::SET_PED_KEEP_TASK((*it).zombie, false);
+						PED::REGISTER_HATED_TARGETS_AROUND_PED((*it).zombie, HEAR_RANGE);
+
+						if (!PED::IS_PED_IN_COMBAT((*it).zombie, true))
+							AI::TASK_WANDER_STANDARD((*it).zombie, 0x471c4000, 0);
+						PED::SET_PED_KEEP_TASK((*it).zombie, true);
+						(*it).lastUpdate = GetTickCount();
+					}
+					if (PED::GET_PED_LAST_DAMAGE_BONE((*it).zombie, &bone))
 					{
 						if (!(bone == IK_Head || bone == SKEL_Head))
-							ENTITY::SET_ENTITY_HEALTH(*it, ENTITY::GET_ENTITY_MAX_HEALTH(*it));
+							ENTITY::SET_ENTITY_HEALTH((*it).zombie, ENTITY::GET_ENTITY_MAX_HEALTH((*it).zombie));
 					}
 				}
 			it++;
 		}
+		return (nb);
 	}
 
 	float	get_random_mul(void)
@@ -149,7 +174,7 @@ namespace Zombie
 	{
 		zone			here = get_zone_by_name(ZONE::GET_NAME_OF_ZONE(point.x, point.y, point.z));
 		unsigned int	max_zombies = (unsigned int)(here.zombieMul * mulZombie * (fivem ? 0.5f : 1.0f));
-		if (zombies.size() <  max_zombies)
+		if (zombies.size() < max_zombies)
 		{
 			int zombiesthisframe = 0;
 			while (zombies.size() < max_zombies && zombiesthisframe < MAX_ZOMBIES_PER_FRAME)
@@ -186,10 +211,13 @@ namespace Zombie
 						i = PED::CREATE_PED(26, Utilities::get_hash(zombieModels[rand() % zombieModels.size()]), x, y, z, (float)(rand() % 360), true, false);
 					else
 						i = PED::CREATE_RANDOM_PED(x, y, z);
-					zombies.push_back(i);
+					managed	a;
+					a.zombie = i;
+					a.lastUpdate = GetTickCount();
+					zombies.push_back(a);
 					PED::SET_PED_MOVEMENT_CLIPSET(i, animation, 0x3e800000);
 					PED::SET_PED_DIES_WHEN_INJURED(i, false);
-					//PED::SET_PED_RELATIONSHIP_GROUP_HASH(i, Utilities::get_hash("COUGAR"));
+					//PED::SET_PED_RELATIONSHIP_GROUP_HASH(i, Utilities::get_hash("ZOMBIE"));
 					PED::SET_PED_RELATIONSHIP_GROUP_HASH(i, Utilities::get_hash("COUGAR"));
 					PED::SET_PED_COMBAT_ABILITY(i, 2);
 					PED::SET_PED_COMBAT_MOVEMENT(i, 3);
@@ -209,6 +237,8 @@ namespace Zombie
 					AI::SET_PED_PATH_AVOID_FIRE(i, false);
 					PED::SET_PED_SEEING_RANGE(i, 8.0f);
 					PED::SET_PED_KEEP_TASK(i, true);
+					PED::SET_PED_AS_ENEMY(i, true);
+					PED::SET_PED_CAN_SMASH_GLASS(i, true, true);
 					PED::SET_PED_CAN_PLAY_AMBIENT_ANIMS(i, false);
 					PED::SET_PED_CAN_EVASIVE_DIVE(i, false);
 					PED::SET_PED_ALERTNESS(i, 3);
@@ -224,7 +254,7 @@ namespace Zombie
 	{
 		return ((unsigned int)zombies.size());
 	}
-	
+
 	void	ZombieMain(void)
 	{
 		DWORD			longTick = GetTickCount(), longTickb = GetTickCount();
@@ -242,7 +272,7 @@ namespace Zombie
 				devMode = true;
 			else
 				devMode = false;
-			GetPrivateProfileString("Options", "mulZombie", "100", buff, 99, "./options.ini");
+			GetPrivateProfileString("Options", "mulZombie", "50", buff, 99, "./options.ini");
 			mulZombie = (float)atof(buff);
 			WritePrivateProfileString("Options", "mulZombie", buff, "./options.ini");
 			fivem = Utilities::getFromFile<bool>(".\\Options.ini", "Options", "fivem", false);
@@ -252,8 +282,16 @@ namespace Zombie
 		if (fivem == true)
 			while (!NETWORK::NETWORK_IS_SESSION_STARTED())
 				WAIT(0);
+		//Groups::init();
+		int	nb = 1;
 		while (true)
 		{
+			if (PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false) && nb > 0)
+			{
+				VEHICLE::_SET_VEHICLE_ENGINE_TORQUE_MULTIPLIER(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 1.0f / ((float)nb / mulZombie * 100.0f));
+				VEHICLE::SET_VEHICLE_ENGINE_HEALTH(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), VEHICLE::GET_VEHICLE_ENGINE_HEALTH(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false)) - (float)nb / mulZombie);
+				VEHICLE::SET_VEHICLE_BODY_HEALTH(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), VEHICLE::GET_VEHICLE_BODY_HEALTH(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false)) - (float)nb / mulZombie);
+			}
 			PLAYER::SET_PLAYER_NOISE_MULTIPLIER(PLAYER::PLAYER_ID(), 2.0f);
 			auto plcoords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED(PLAYER::PLAYER_ID()), true);
 			if (GetTickCount() > longTick)
@@ -263,7 +301,9 @@ namespace Zombie
 			}
 			if (GetTickCount() > longTickb)
 			{
-				Zombie::actualize_attacks();
+				nb = Zombie::actualize_attacks_return_near(5.0f);
+				if (nb > 0 && PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
+					ENTITY::APPLY_FORCE_TO_ENTITY(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 3, (float)(rand() % 500) * (float)nb, (float)(rand() % 500) * (float)nb, 0 , 0,0,0,false, true, true, false, false, true);
 				longTickb = GetTickCount() + 1500;
 			}
 			if (devMode)

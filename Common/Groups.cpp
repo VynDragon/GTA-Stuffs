@@ -1,3 +1,3 @@
 #include "Groups.h"
 
-Hash	Groups::wanderer = 0, Groups::guard = 0;
+Hash	Groups::zombie = 0, Groups::wanderer = 0, Groups::guard = 0;

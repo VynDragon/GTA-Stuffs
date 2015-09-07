@@ -7,26 +7,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Common\Groups.cpp" />
     <ClCompile Include="..\Common\keyboard.cpp" />
     <ClCompile Include="..\Common\Utilities.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Zombie.cpp" />
+    <ClCompile Include="script.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\Groups.h" />
-    <ClInclude Include="..\Common\ZombieModels.h" />
-    <ClInclude Include="..\Common\Zones.h" />
-    <ClInclude Include="..\inc\enums.h" />
-    <ClInclude Include="..\inc\natives.h" />
-    <ClInclude Include="..\inc\types.h" />
-    <ClInclude Include="Zombie.h" />
+    <ClInclude Include="..\Common\Keys.h" />
+    <ClInclude Include="..\Common\Utilities.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8D82F34A-1D64-465B-84B1-37F89AD3D20B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Zombie</RootNamespace>
-    <ProjectName>Zombie</ProjectName>
+    <RootNamespace>Passenger</RootNamespace>
+    <ProjectName>Passenger</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -57,7 +51,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;NativeTrainer_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;Passenger_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>

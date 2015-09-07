@@ -213,11 +213,19 @@ void main(bool snow, bool xmasWeather)
 			left.z = forward.z * 0.8f;
 			Vector3	newforward = forward;
 			newforward.z = newforward.z - 0.1f;
+			forward.x *= 2.0f;
+			forward.y *= 2.0f;
+			forward.z *= 2.0f;
 			VEHICLE::GET_VEHICLE_LIGHTS_STATE(vehicles[i], &on, &rail);
-			if (!VEHICLE::_IS_HEADLIGHT_L_BROKEN(vehicles[i]) && on)
-				GRAPHICS::DRAW_SPOT_LIGHT(pos.x - left.x + forward.x, pos.y - left.y + forward.y, pos.z - left.z + forward.z, newforward.x, newforward.y, newforward.z, 255, 255, 255, 25.0f, 5.0f, 5.0f, 15.0f, 1.0f);
-			if (!VEHICLE::_IS_HEADLIGHT_R_BROKEN(vehicles[i]) && on)
-				GRAPHICS::DRAW_SPOT_LIGHT(pos.x + left.x + forward.x, pos.y + left.y + forward.y, pos.z + left.z + forward.z, newforward.x, newforward.y, newforward.z, 255, 255, 255, 25.0f, 5.0f, 5.0f, 15.0f, 0.5f);
+			if (on && VEHICLE::_IS_VEHICLE_ENGINE_ON(vehicles[i]))
+			{
+				if (!VEHICLE::_IS_HEADLIGHT_L_BROKEN(vehicles[i]))
+					GRAPHICS::DRAW_SPOT_LIGHT(pos.x - left.x + forward.x, pos.y - left.y + forward.y, pos.z + 0.5f - left.z + forward.z, newforward.x, newforward.y, newforward.z, 255, 255, 255, 55.0f, 1.0f, 5.0f, 35.0f, 10.0f);
+				if (!VEHICLE::_IS_HEADLIGHT_R_BROKEN(vehicles[i]))
+					GRAPHICS::DRAW_SPOT_LIGHT(pos.x + left.x + forward.x, pos.y + left.y + forward.y, pos.z + 0.5f + left.z + forward.z, newforward.x, newforward.y, newforward.z, 255, 255, 255, 55.0f, 2.0f, 5.0f, 35.0f, 10.0f);
+				GRAPHICS::DRAW_SPOT_LIGHT(pos.x + left.x - forward.x, pos.y + left.y - forward.y, pos.z + 0.5f + left.z - forward.z, -newforward.x, -newforward.y, -newforward.z, 255, 5, 5, 2.0f, 2.0f, 2.0f, 35.0f, 0.5f);
+				GRAPHICS::DRAW_SPOT_LIGHT(pos.x - left.x - forward.x, pos.y - left.y - forward.y, pos.z + 0.5f - left.z - forward.z, -newforward.x, -newforward.y, -newforward.z, 255, 5, 5, 2.0f, 2.0f, 2.0f, 35.0f, 0.5f);
+			}
 			/*VEHICLE::SET_VEHICLE_LIGHT_MULTIPLIER(vehicles[i], 1.0f);
 			VEHICLE::SET_VEHICLE_LIGHTS(vehicles[i], 2);*/
 		}
