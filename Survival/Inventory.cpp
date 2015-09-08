@@ -23,9 +23,11 @@ Inventory::~Inventory()
 
 int		Inventory::use(std::vector<InventoryObject*>::iterator it, PedStatus *ped)
 {
-	(*it)->effect(ped);
-	delete (*it);
-	list.erase(it);
+	if (!(*it)->effect(ped))
+	{
+		delete (*it);
+		list.erase(it);
+	}
 	return (0);
 }
 
@@ -69,6 +71,8 @@ int										Inventory::fromString(const std::string &str)
 			k++;
 		if (k < weapon_list.size())
 			this->addObject(new InventoryObject_Weapon(weapon_list[k]));
+		if (item.find("Repair Kit"))
+			this->addObject(new InventoryObject_RepairKit());
 		if (item.find('x') != std::string::npos)
 		{
 			std::string tmp = item.substr(0, item.rfind('x'));

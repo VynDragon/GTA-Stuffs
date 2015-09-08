@@ -2,6 +2,7 @@
 
 #define EQUIP_STRING "Equip"
 #define DROP_STRING "Drop"
+#define USE_STRING "Use"
 
 #define WEAPON_ACTUALIZATION_DELAY 1000
 

@@ -55,7 +55,7 @@ void main()
 	ContainerManager::setCurrent(&containerManager);
 	while (true)
 	{
-		OutputDebugString("start tick");
+		//OutputDebugString("start tick");
 		// pre tick setup
 		PLAYER::_SET_PLAYER_HEALTH_REGENERATION_RATE(PLAYER::PLAYER_ID(), 0.0f);
 		// menu switch
@@ -77,9 +77,9 @@ void main()
 		// all else go here
 		OptionManager::options.tick();
 		KeyManager::keys.tick();
-		OutputDebugString("start player tick");
+		//OutputDebugString("start player tick");
 		player->tick();
-		OutputDebugString("end player tick");
+		//OutputDebugString("end player tick");
 		hud->draw();
 		if (GetTickCount() > longTick)
 		{
@@ -87,7 +87,7 @@ void main()
 			longTick = GetTickCount() + 600;
 		}
 		// look like that WAIT is important
-		OutputDebugString("end tick");
+		//OutputDebugString("end tick");
 		WAIT(0);
 	}
 }

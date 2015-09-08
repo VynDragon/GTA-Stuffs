@@ -77,7 +77,7 @@ void				LightManager::tick(Vector3 pos, float distance) const
 
 	while (it != list.end())
 	{
-		if (!(*it).spot && GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS((*it).pos.x, (*it).pos.y, (*it).pos.z, pos.x, pos.y, pos.z, true) < distance)
+		if (!(*it).spot && GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS((*it).pos.x, (*it).pos.y, (*it).pos.z, pos.x, pos.y, pos.z, true) < distance && INTERIOR::GET_INTERIOR_FROM_COLLISION(pos.x, pos.y, pos.z))
 		{
 			//GRAPHICS::DRAW_LIGHT_WITH_RANGE((*it).pos.x, (*it).pos.y, (*it).pos.z, (*it).r, (*it).g, (*it).b, (*it).range, (*it).intensity);
 			GRAPHICS::DRAW_SPOT_LIGHT((*it).pos.x, (*it).pos.y, (*it).pos.z - 0.2f, 0, 0, 1, (*it).r, (*it).g, (*it).b, (*it).range * 2.0f, (*it).intensity * 2.0f, 30.0f, 200.0f, (*it).range * 2.0f);

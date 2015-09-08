@@ -38,6 +38,18 @@ private:
 	std::string	name;
 };
 
+class InventoryObject_RepairKit : public InventoryObject
+{
+public:
+	InventoryObject_RepairKit(void) { name = "Repair Kit"; }
+	~InventoryObject_RepairKit(void) {}
+	const std::string		&getName(void) const { return (name); }
+	InventoryObject			*clone(void) const { return (new InventoryObject_RepairKit()); }
+	int						effect(PedStatus *ped);
+private:
+	std::string				name;
+};
+
 class InventoryObject_Ammo : public InventoryObject
 {
 public:

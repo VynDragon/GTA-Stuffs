@@ -52,6 +52,14 @@ void		ContainerManager::openCrate(Object crate, Inventory *inv)
 				ammoType ammo = ammoTypes[rand() % ammoTypes.size()];
 				inv->addObject(new InventoryObject_Ammo(ammo.name, ammo.weapon, rand() % 20 + 1));
 			}
+			if (rand() % 4 == 1)
+			{
+				inv->addObject(new InventoryObject_Weapon("WEAPON_PETROLCAN"));
+			}
+			if (rand() % 4 == 1)
+			{
+				inv->addObject(new InventoryObject_RepairKit());
+			}
 		}
 		
 		if (OptionManager::options.devMode)

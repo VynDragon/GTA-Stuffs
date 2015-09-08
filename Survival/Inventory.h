@@ -10,6 +10,7 @@ public:
 	~Inventory();
 	static const Inventory							emptyInventory;
 	void											addObject(InventoryObject *object) { list.push_back(object); }
+	void											remove(std::vector<InventoryObject*>::iterator it) { delete (*it); list.erase(it); }
 	std::vector<InventoryObject*>::iterator			begin() { return(list.begin()); }
 	std::vector<InventoryObject*>::iterator			end() { return(list.end()); }
 	std::vector<InventoryObject*>::const_iterator	begin() const { return(list.cbegin()); }

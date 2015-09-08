@@ -47,6 +47,19 @@ namespace Zombie
 				return (-1);
 		}
 	}
+
+	Ped	get_closest_pped(Ped ped)
+	{
+		if (NETWORK::NETWORK_IS_SESSION_STARTED()) // unimplemented
+		{
+			return (-1);
+		}
+		else
+		{
+			return (PLAYER::PLAYER_PED_ID());
+		}
+	}
+
 	static std::vector<managed>	zombies;
 	void		zombify_nearby_ped(Ped id) // shitfunction
 	{
@@ -123,9 +136,7 @@ namespace Zombie
 				if (!PED::_IS_PED_DEAD((*it).zombie, true))
 				{
 					Any	bone;
-					if (PED::IS_PED_IN_ANY_VEHICLE((*it).zombie, true))
-						AI::CLEAR_PED_TASKS_IMMEDIATELY((*it).zombie);
-					Ped target = PLAYER::PLAYER_PED_ID();
+					Ped target = get_closest_pped((*it).zombie);
 					if (ENTITY::IS_AN_ENTITY(target) ? PED::IS_PED_IN_ANY_VEHICLE(target, false) && (*it).lastUpdate < GetTickCount() : false)
 					{
 						Vector3 tCoords = ENTITY::GET_ENTITY_COORDS(target, true);
@@ -134,7 +145,7 @@ namespace Zombie
 							nb++;
 						if (PED::IS_PED_IN_ANY_VEHICLE(target, false))
 						{
-							AI::TASK_GO_STRAIGHT_TO_COORD((*it).zombie, tCoords.x, tCoords.y, tCoords.z, 2.0f, 10000, rand() % 360, 0.0f);
+							AI::TASK_GO_STRAIGHT_TO_COORD((*it).zombie, tCoords.x, tCoords.y, tCoords.z, 2.0f, -1, rand() % 360, 0.0f);
 						}
 						(*it).lastUpdate = GetTickCount() + 100;
 					}
@@ -144,7 +155,6 @@ namespace Zombie
 						AI::CLEAR_PED_SECONDARY_TASK((*it).zombie);
 						PED::SET_PED_KEEP_TASK((*it).zombie, false);
 						PED::REGISTER_HATED_TARGETS_AROUND_PED((*it).zombie, HEAR_RANGE);
-
 						if (!PED::IS_PED_IN_COMBAT((*it).zombie, true))
 							AI::TASK_WANDER_STANDARD((*it).zombie, 0x471c4000, 0);
 						PED::SET_PED_KEEP_TASK((*it).zombie, true);
@@ -303,7 +313,7 @@ namespace Zombie
 			{
 				nb = Zombie::actualize_attacks_return_near(5.0f);
 				if (nb > 0 && PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false))
-					ENTITY::APPLY_FORCE_TO_ENTITY(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 3, (float)(rand() % 500) * (float)nb, (float)(rand() % 500) * (float)nb, 0 , 0,0,0,false, true, true, false, false, true);
+					ENTITY::APPLY_FORCE_TO_ENTITY(PED::GET_VEHICLE_PED_IS_IN(PLAYER::PLAYER_PED_ID(), false), 3, (float)(rand() % 700) * (float)nb, (float)(rand() % 700) * (float)nb, 0 , 0,0,0,false, true, true, false, false, true);
 				longTickb = GetTickCount() + 1500;
 			}
 			if (devMode)

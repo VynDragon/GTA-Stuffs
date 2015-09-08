@@ -60,7 +60,7 @@ Ped		PedStatus::getId(void)
 
 int PedStatus::doTick(void)
 {
-	OutputDebugString("entering player dotick");
+	//OutputDebugString("entering player dotick");
 	if (moved && respawnTimer < GetTickCount())
 	{
 		Vector3	po = this->getPos();
@@ -126,7 +126,7 @@ int PedStatus::doTick(void)
 	else if (food < LOSSLIMIT || water < LOSSLIMIT)
 		ENTITY::SET_ENTITY_HEALTH(pedId, ENTITY::GET_ENTITY_HEALTH(pedId) -LOSSRATE);
 	time = GetTickCount() + TICK_LENGTH;
-	OutputDebugString("exiting player dotick");
+	//OutputDebugString("exiting player dotick");
 	return (0);
 }
 

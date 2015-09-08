@@ -61,3 +61,40 @@ int						InventoryObject_Ammo::effect(PedStatus *ped)
 	WEAPON::ADD_AMMO_TO_PED(ped->getId(), Utilities::get_hash(weapon), amount);
 	return (0);
 }
+
+int InventoryObject_RepairKit::effect(PedStatus * ped)
+{
+	Vector3	pos = ped->getPos();
+	int		entries[20 * 2 + 2] = { 0 };
+	entries[0] = 20;
+	int		ct = PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), entries);
+	int		closest = 0;
+	float	lastdistance = (std::numeric_limits<float>::max)();
+	for (int i = 2; i < ct * 2; i += 2)
+	{
+		if (ENTITY::DOES_ENTITY_EXIST(entries[i]))
+		{
+			Vector3	a = ENTITY::GET_ENTITY_COORDS(entries[i], true), b = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+			float dist = GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(a.x, a.y, a.z, b.x, b.y, b.z, true);
+			if (dist < lastdistance)
+			{
+				lastdistance = dist;
+				closest = entries[i];
+			}
+		}
+	}
+	if (closest != 0)
+	{
+		ENTITY::SET_ENTITY_HEALTH(closest, ENTITY::GET_ENTITY_MAX_HEALTH(closest));
+		VEHICLE::SET_VEHICLE_ENGINE_HEALTH(closest, 1000);
+		VEHICLE::SET_VEHICLE_BODY_HEALTH(closest, 1000);
+		VEHICLE::SET_VEHICLE_PETROL_TANK_HEALTH(closest, 1000);
+		VEHICLE::SET_VEHICLE_FIXED(closest);
+		VEHICLE::SET_VEHICLE_DEFORMATION_FIXED(closest);
+	}
+	else
+	{
+		Utilities::notify("No vehicle to repair found");
+		return (1);
+	}
+}
