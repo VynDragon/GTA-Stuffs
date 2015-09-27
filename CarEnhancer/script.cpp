@@ -3,6 +3,7 @@
 #include "CarManager.h"
 #include "..\Common\Utilities.h"
 #include "..\Common\Keys.h"
+#include "..\Common\VehicleList.h"
 #include <sstream>
 #include <vector>
 
@@ -10,7 +11,8 @@
 void main(float fuelConsumptionMultiplier, DWORD fuelKey)
 {
 	CarManager	manager(FILE);
-	Vehicle		lastVehicle;
+	Vehicle		lastVehicle = 0;
+	DWORD		longTick = GetTickCount();
 	bool		saved = false;
 
 	while (true)
@@ -40,12 +42,15 @@ void main(float fuelConsumptionMultiplier, DWORD fuelKey)
 			lastVehicle = veh;
 			saved = false;
 		}
-		else if (saved == false)
+		else if (saved == false && lastVehicle != 0 && ENTITY::DOES_ENTITY_EXIST(lastVehicle))
 		{
 			CarManager::managed i = manager.getManagedByVehicle(lastVehicle);
+			if (ENTITY::DOES_ENTITY_EXIST(i.vehicle) ? !VEHICLE::IS_VEHICLE_DRIVEABLE(i.vehicle, false) : true)
+				i.that->setBroken(true);
 			i.that->updateLoaded(lastVehicle);
 			i.that->writeToFile(Utilities::xToString<unsigned int>(i.id), FILE);
 			saved = true;
+			lastVehicle = 0;
 		}
 		Hash	wep;
 		WEAPON::GET_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), &wep, true);
@@ -64,6 +69,26 @@ void main(float fuelConsumptionMultiplier, DWORD fuelKey)
 				}
 				it++;
 			}
+		}
+		if (GetTickCount() > longTick && manager.getLoaded()->size() < 2)
+		{
+			Vector3	outb;
+			if (PATHFIND::GET_SAFE_COORD_FOR_PED(plCoords.x + rand() % 180 - 90, plCoords.y + rand() % 180 - 90, plCoords.z, false, &outb, 0))
+			{
+				if (PATHFIND::IS_POINT_ON_ROAD(outb.x, outb.y, outb.z, 0) && !CAM::IS_SPHERE_VISIBLE(outb.x, outb.y, outb.z + 2.0f, 10.0f) && GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(outb.x, outb.y, outb.z, plCoords.x, plCoords.y, plCoords.z, true) > 50.0f)
+				{
+					std::string veh = vehicleList[rand() % vehicleList.size()];
+					int vh = VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(Utilities::get_hash(veh));
+					do
+					{
+						veh = vehicleList[rand() % vehicleList.size()];
+						vh = VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(Utilities::get_hash(veh));
+						
+					} while (vh == 15 || vh == 16);
+					manager.add(new Veh(outb.x, outb.y, outb.z, (float)(rand() % 360), veh), true);
+				}
+			}
+			longTick = GetTickCount() + 100;
 		}
 		//Utilities::putText("Petrolcan: " + Utilities::xToString<Hash>(Utilities::get_hash("WEAPON_PETROLCAN")) + " Weapon: " + Utilities::xToString<Hash>(wep), 0.5f, 0.7f);
 		manager.tick(plCoords, 150.0f);
@@ -84,5 +109,9 @@ void			ScriptMain()
 	if (fKey == "E key")
 		Utilities::writeToFile<std::string>(".\\Options.ini", "Options", "fuelKey", fKey);
 	fuelKey = Keys::find_key_by_name(fKey).vkey;
+	while (!ENTITY::DOES_ENTITY_EXIST(PLAYER::PLAYER_PED_ID()))
+		WAIT(0);
+	while (!PLAYER::IS_PLAYER_CONTROL_ON(PLAYER::PLAYER_ID()))
+		WAIT(0);
 	main(fm, fuelKey);
 }

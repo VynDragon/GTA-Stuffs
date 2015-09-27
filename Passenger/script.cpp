@@ -16,21 +16,20 @@ void main(DWORD	key)
 	{
 		if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), true) && IsKeyJustUp(key))
 		{
-			int				entries[NBENTRIES * 2 + 2] = { 0 };
-			entries[0] = 20;
-			int		ct = PED::GET_PED_NEARBY_VEHICLES(PLAYER::PLAYER_PED_ID(), entries);
+			Vehicle vehicles[512];
+			int		count = worldGetAllVehicles(vehicles, 512);
 			int		closest = 0;
 			float	lastdistance = (std::numeric_limits<float>::max)();
-			for (int i = 2; i < ct * 2; i += 2)
+			for (int i = 0; i < count; i++)
 			{
-				if (ENTITY::DOES_ENTITY_EXIST(entries[i]))
+				if (ENTITY::DOES_ENTITY_EXIST(vehicles[i]))
 				{
-					Vector3	a = ENTITY::GET_ENTITY_COORDS(entries[i], true), b = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+					Vector3	a = ENTITY::GET_ENTITY_COORDS(vehicles[i], true), b = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
 					float dist = GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(a.x, a.y, a.z, b.x, b.y, b.z, true);
 					if (dist < lastdistance)
 					{
 						lastdistance = dist;
-						closest = entries[i];
+						closest = vehicles[i];
 					}
 				}
 			}

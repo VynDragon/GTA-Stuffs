@@ -17,9 +17,11 @@ public:
 	float				getX(void) const { return (x); }
 	float				getY(void) const { return (y); }
 	float				getZ(void) const { return (z); }
+	bool				getBroken(void) const { return (broken); }
 	float				getFuel(void) const { return (fuel); }
 	float				getMaxFuel(void) const { return (maxFuel); }
 	void				setFuel(float fuel) { this->fuel = fuel; }
+	void				setBroken(bool i) { this->broken = i; }
 	std::string			getModel(void) const { return (model); }
 	void				updateLoaded(Vehicle veh);
 	void				loadFromFile(const std::string &appName, const std::string &file);
@@ -31,6 +33,7 @@ protected:
 	float				x, y, z, heading;
 	std::string			model;
 	float				fuel, maxFuel;
+	bool				broken;
 };
 
 

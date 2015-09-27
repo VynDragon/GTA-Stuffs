@@ -143,10 +143,8 @@ namespace Zombie
 						Vector3	pCoords = ENTITY::GET_ENTITY_COORDS((*it).zombie, true);
 						if (GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(tCoords.x, tCoords.y, tCoords.z, pCoords.x, pCoords.y, pCoords.z, true) < 3.0f)
 							nb++;
-						if (PED::IS_PED_IN_ANY_VEHICLE(target, false))
-						{
+						if (GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(tCoords.x, tCoords.y, tCoords.z, pCoords.x, pCoords.y, pCoords.z, true) < 50.0f)
 							AI::TASK_GO_STRAIGHT_TO_COORD((*it).zombie, tCoords.x, tCoords.y, tCoords.z, 2.0f, -1, rand() % 360, 0.0f);
-						}
 						(*it).lastUpdate = GetTickCount() + 100;
 					}
 					if (PED::IS_PED_STOPPED((*it).zombie) && (*it).lastUpdate < GetTickCount())
@@ -273,7 +271,9 @@ namespace Zombie
 		float			mulZombie;
 		srand(GetTickCount());
 
-		while (GetTickCount() < waitforready)
+		while (!ENTITY::DOES_ENTITY_EXIST(PLAYER::PLAYER_PED_ID()))
+			WAIT(0);
+		while (!PLAYER::IS_PLAYER_CONTROL_ON(PLAYER::PLAYER_ID()))
 			WAIT(0);
 		{
 			char	buff[100];

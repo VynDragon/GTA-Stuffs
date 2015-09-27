@@ -51,4 +51,5 @@ namespace Utilities
 	DWORD				get_hash(const std::string &str);
 	Object				create_object(const std::string &name, Vector3 pos);
 	void				log_text(const std::string &str);
+	std::string			input_text();
 }

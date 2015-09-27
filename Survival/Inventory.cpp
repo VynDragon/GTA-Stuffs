@@ -71,7 +71,7 @@ int										Inventory::fromString(const std::string &str)
 			k++;
 		if (k < weapon_list.size())
 			this->addObject(new InventoryObject_Weapon(weapon_list[k]));
-		if (item.find("Repair Kit"))
+		if (item.find("Repair Kit") != std::string::npos)
 			this->addObject(new InventoryObject_RepairKit());
 		if (item.find('x') != std::string::npos)
 		{

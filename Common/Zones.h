@@ -92,7 +92,11 @@ static const std::vector<zone> zones = { { "", 0.20f },
 { "OBSERV", 0.5f},
 { "JAIL" , 3 },
 {"LEGSQU", 3},
-{"ZQ_UAR", 0.45f}
+{"ZQ_UAR", 0.45f},
+{"BANHAMC", 0.35f},
+{"PALMPOW", 1.0f},
+{"HORS", 3},
+{"NOOSE",2}
 };
 
 zone		get_zone_by_name(const std::string &name)

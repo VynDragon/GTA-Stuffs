@@ -17,11 +17,12 @@ PedStatus::PedStatus(Ped playerId)
 {
 	food = STATLIMIT;
 	water = STATLIMIT;
-	this->pedId = pedId;
+	this->pedId = playerId;
 	lastPedId = 0;
 	moved = false;
 	time = GetTickCount();
 	respawnTimer = 0;
+	dead = false;
 }
 
 
@@ -61,7 +62,7 @@ Ped		PedStatus::getId(void)
 int PedStatus::doTick(void)
 {
 	//OutputDebugString("entering player dotick");
-	if (moved && respawnTimer < GetTickCount())
+	if (moved && PLAYER::PLAYER_PED_ID() == pedId && !PED::_IS_PED_DEAD(pedId, true) && PLAYER::IS_PLAYER_CONTROL_ON(PLAYER::PLAYER_ID()))
 	{
 		Vector3	po = this->getPos();
 		if (GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(targetPos.x, targetPos.y, targetPos.z, po.x, po.y, po.z, true) < 10.0f)
@@ -72,7 +73,7 @@ int PedStatus::doTick(void)
 		else
 			ENTITY::SET_ENTITY_COORDS(pedId, targetPos.x, targetPos.y, targetPos.z, true, true, true, true);
 	}
-	if (PED::_IS_PED_DEAD(pedId, true) && !dead)
+	if (ENTITY::DOES_ENTITY_EXIST(pedId) ? PED::_IS_PED_DEAD(pedId, true) && !dead : false)
 	{
 		food = STATLIMIT;
 		water = STATLIMIT;
@@ -99,7 +100,7 @@ int PedStatus::doTick(void)
 		Vector3 out;
 		do
 		{
-			float	x = pos.x + (float)(get_random_mul() * (rand() % 120 + 100.0f)), y = pos.y + (float)(get_random_mul() * (rand() % 120 + 100.0f)), z = 0;
+			float	x = pos.x + (float)(get_random_mul() * (rand() % 240 + 120.0f)), y = pos.y + (float)(get_random_mul() * (rand() % 240 + 120.0f)), z = 0;
 			GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(x, y, pos.z + 10.0f, &z);
 			WAIT(100);
 			if (z <= 0)
@@ -114,8 +115,9 @@ int PedStatus::doTick(void)
 		moved = true;
 		respawnTimer = GetTickCount() + 20000;
 	}
-	else if (!PED::_IS_PED_DEAD(pedId, true))
+	else if (ENTITY::DOES_ENTITY_EXIST(pedId) ? !PED::_IS_PED_DEAD(pedId, true) : false)
 		dead = false;
+	//OutputDebugString("end dead zone");
 	ENTITY::SET_ENTITY_MAX_HEALTH(pedId, 200);
 	food -= FOODRATE;
 	water -= WATERRATE;

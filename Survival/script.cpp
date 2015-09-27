@@ -94,12 +94,13 @@ void main()
 
 void ScriptMain()
 {
-	DWORD waitforready = GetTickCount() + 5000;
 	srand(GetTickCount());
 	GRAPHICS::CLEAR_DRAW_ORIGIN();
 	/*GAMEPLAY::_DISABLE_AUTOMATIC_RESPAWN(true);
 	GAMEPLAY::SET_FADE_IN_AFTER_DEATH_ARREST(false);*/
-	while (GetTickCount() < waitforready)
+	while (!ENTITY::DOES_ENTITY_EXIST(PLAYER::PLAYER_PED_ID()))
+		WAIT(0);
+	while (!PLAYER::IS_PLAYER_CONTROL_ON(PLAYER::PLAYER_ID()))
 		WAIT(0);
 	main();
 }

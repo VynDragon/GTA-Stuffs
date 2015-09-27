@@ -157,7 +157,7 @@ void main(bool snow, bool xmasWeather)
 		GRAPHICS::_SET_PTFX_ASSET_NEXT_CALL("core_snow");
 		GRAPHICS::START_PARTICLE_FX_NON_LOOPED_ON_ENTITY("core_snow", PLAYER::PLAYER_PED_ID(), 0.0, 0.0, -0.5, 0.0, 0.0, 0.0, 1.0, false, false, false);*/
 		VEHICLE::SET_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME(0.0f); // disable traffic
-		PED::SET_PED_DENSITY_MULTIPLIER_THIS_FRAME(0.0f); // disable random peds
+		//PED::SET_PED_DENSITY_MULTIPLIER_THIS_FRAME(0.0f); // disable random peds
 		//VEHICLE::SET_ALL_VEHICLE_GENERATORS_ACTIVE_IN_AREA(plcoords.x - 500.0f, plcoords.y - 500.0f, plcoords.z - 500.0f, plcoords.x + 500.0f, plcoords.y + 500.0f, plcoords.z + 500.0f, false, false); // seems to be disabling vehicle generators
 		Vector3 plcoords = ENTITY::GET_ENTITY_COORDS(PLAYER::GET_PLAYER_PED(PLAYER::PLAYER_ID()), true);
 		VEHICLE::REMOVE_VEHICLES_FROM_GENERATORS_IN_AREA(plcoords.x - 500.0f, plcoords.y - 500.0f, plcoords.z - 500.0f, plcoords.x + 500.0f, plcoords.y + 500.0f, plcoords.z + 500.0f);
@@ -166,7 +166,7 @@ void main(bool snow, bool xmasWeather)
 		VEHICLE::SET_RANDOM_TRAINS(false);
 		VEHICLE::SET_RANDOM_BOATS(false);
 		VEHICLE::SET_GARBAGE_TRUCKS(false);
-		STREAMING::SET_VEHICLE_POPULATION_BUDGET(0);
+		//STREAMING::SET_VEHICLE_POPULATION_BUDGET(0);
 		PLAYER::CLEAR_PLAYER_WANTED_LEVEL(PLAYER::PLAYER_ID());
 		PLAYER::SET_MAX_WANTED_LEVEL(0);
 		GRAPHICS::DISABLE_VEHICLE_DISTANTLIGHTS(true);

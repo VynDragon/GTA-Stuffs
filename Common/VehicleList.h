@@ -45,7 +45,7 @@ static const std::vector<std::string> vehicleList =
 	 "BRAWLER"
 };
 
-std::string		getModelNameByHash(Hash hash)
+static std::string		getModelNameByHash(Hash hash)
 {
 	auto		it = vehicleList.begin();
 

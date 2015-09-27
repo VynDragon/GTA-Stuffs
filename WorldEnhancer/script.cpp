@@ -62,7 +62,7 @@ void main(bool devMode, float enhancerRenderDistance, unsigned int wreckDensity)
 			{*/
 				if (PATHFIND::GET_SAFE_COORD_FOR_PED(plcoords.x + rand() % 180 - 90, plcoords.y + rand() % 180 - 90, plcoords.z, false, &outb, 0))
 				{
-					if (PATHFIND::IS_POINT_ON_ROAD(outb.x, outb.y, outb.z, 0) && !CAM::IS_SPHERE_VISIBLE(outb.x, outb.y, out.z + 2.0f, 10.0f) && GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(outb.x, outb.y, out.z, plcoords.x, plcoords.y, plcoords.z, true) > 50.0f)
+					if (PATHFIND::IS_POINT_ON_ROAD(outb.x, outb.y, outb.z, 0) && !CAM::IS_SPHERE_VISIBLE(outb.x, outb.y, outb.z + 2.0f, 10.0f) && GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(outb.x, outb.y, out.z, plcoords.x, plcoords.y, plcoords.z, true) > 50.0f)
 					{
 						if (carManager.getLoaded()->size() < wreckDensity)
 						{

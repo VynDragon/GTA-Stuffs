@@ -17,9 +17,28 @@ CarManager::CarManager(const std::string &file)
 			that = new Veh(Utilities::xToString<unsigned int>(total), file);
 		else
 			break;
-		this->add(that, false);
+		if (!that->getBroken())
+			this->add(that, false);
+		else
+			delete that;
 		total++;
 	}
+	/*if (total == 0)
+	{
+		while (total < 100)
+		{
+			Vector3	out;
+			if (PATHFIND::GET_SAFE_COORD_FOR_PED(rand() % 5000 - 2500, rand() % 5000 - 2500, 1000, false, &out, 0))
+			{
+				if (PATHFIND::IS_POINT_ON_ROAD(out.x, out.y, out.z, 0))
+				{
+					Veh *that = new Veh(out.x, out.y, out.z, (float)(rand() % 360), vehicleList[rand() % vehicleList.size()]);
+					this->add(that, true);
+				}
+			}
+		
+		}
+	}*/
 }
 
 
@@ -52,7 +71,7 @@ void CarManager::tick(Vector3 position, float range)
 
 	while (it != unloaded.end())
 	{
-		if (GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(position.x, position.y, position.z, (*it).that->getX(), (*it).that->getY(), (*it).that->getZ(), true) < range)
+		if (GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(position.x, position.y, position.z, (*it).that->getX(), (*it).that->getY(), (*it).that->getZ(), true) < range && !(*it).that->getBroken())
 		{
 			DWORD attachhash = Utilities::get_hash((*it).that->getModel());
 			if (STREAMING::IS_MODEL_VALID(attachhash)) {
@@ -77,6 +96,11 @@ void CarManager::tick(Vector3 position, float range)
 		if ((GAMEPLAY::GET_DISTANCE_BETWEEN_COORDS(position.x, position.y, position.z, coords.x, coords.y, coords.z, true) > range
 			&& !CAM::IS_SPHERE_VISIBLE(coords.x, coords.y, coords.z, 1.0)) || !ENTITY::DOES_ENTITY_EXIST((*it).vehicle))
 		{
+			if (ENTITY::DOES_ENTITY_EXIST((*it).vehicle) ? !VEHICLE::IS_VEHICLE_DRIVEABLE((*it).vehicle, false) : true)
+			{
+				(*it).that->setBroken(true);
+				(*it).that->writeToFile(Utilities::xToString<unsigned int>(it->id), FILE);
+			}
 			VEHICLE::DELETE_VEHICLE(&(*it).vehicle);
 			unloaded.push_back(*it);
 			loaded.erase(it);
@@ -115,6 +139,7 @@ Veh::Veh(float x, float y, float z, float heading, Hash modelHash)
 	this->maxFuel = getVehicleClassById(VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(modelHash)).maxFuel;
 	this->heading = heading;
 	this->fuel = ((float)(rand() % 100)) / 100.0f * maxFuel;
+	this->broken = false;
 }
 
 Veh::Veh(float x, float y, float z, float heading, const std::string &model)
@@ -126,6 +151,7 @@ Veh::Veh(float x, float y, float z, float heading, const std::string &model)
 	this->maxFuel = getVehicleClassById(VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(Utilities::get_hash(model))).maxFuel;
 	this->heading = heading;
 	this->fuel = ((float)(rand() % 100)) / 100.0f * maxFuel;
+	this->broken = false;
 }
 
 void Veh::updateLoaded(Vehicle veh)
@@ -145,6 +171,7 @@ void Veh::loadFromFile(const std::string & appName, const std::string & file)
 	heading = Utilities::getFromFile<float>(file, appName, "heading", 0);
 	model = Utilities::getFromFile<std::string>(file, appName, "model", "");
 	fuel = Utilities::getFromFile<float>(file, appName, "fuel", 0);
+	broken = Utilities::getFromFile<bool>(file, appName, "broken", false);
 	maxFuel = getVehicleClassById(VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(Utilities::get_hash(model))).maxFuel;
 }
 
@@ -156,6 +183,7 @@ void Veh::writeToFile(const std::string & appName, const std::string & file)
 	Utilities::writeToFile<float>(file, appName, "heading", heading);
 	Utilities::writeToFile<std::string>(file, appName, "model", model);
 	Utilities::writeToFile<std::string>(file, appName, "class", getClassName());
+	Utilities::writeToFile<bool>(file, appName, "broken", broken);
 	Utilities::writeToFile<float>(file, appName, "fuel", fuel);
 }
 

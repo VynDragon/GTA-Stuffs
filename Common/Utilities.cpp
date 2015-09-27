@@ -80,4 +80,12 @@ namespace Utilities
 		file << str;
 		file.close();
 	}
+
+	std::string		input_text()
+	{
+		GAMEPLAY::DISPLAY_ONSCREEN_KEYBOARD(false, "FMMC_KEY_TIP", "", "", "", "", "", 100);
+		while (GAMEPLAY::UPDATE_ONSCREEN_KEYBOARD() == 0) WAIT(0);
+		return GAMEPLAY::GET_ONSCREEN_KEYBOARD_RESULT();
+	}
+
 }
